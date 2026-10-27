@@ -187,36 +187,88 @@ Un gérant est aussi mécanicien et peut acheter comme client. On peut représen
 \end{exobox}
 \source{ASI\_C1, partie cas d'utilisation ; ASI\_C5, page 8 ; TD Station multi-énergies et Agence de voyages.}
 
-\section{Description textuelle d'un cas : le contrat du scénario}
-\subsection{Gabarit complet à copier}
-\begin{tabularx}{\linewidth}{@{}p{37mm}X@{}}
+\section{Description textuelle détaillée : ne jamais l'oublier}
+\begin{warningbox}
+Le \textbf{travail 2} du TD \emph{Organisation de courses de fond} demande cette description. Même lorsque l'écrit note surtout des diagrammes, la description donne les messages de la N1. \textbf{Une liste de clics ou trois phrases ne suffit pas}. Le cours ASI\_C1, page 36, montre un exemple complet de retrait d'argent.
+\end{warningbox}
+\subsection{Les rubriques exactes et leur rôle}
+\begin{longtable}{@{}p{37mm}p{102mm}@{}}
 \toprule
-Champ & Contenu attendu \\
+Rubrique & Ce qu'il faut écrire, en français très simple \\
+\midrule\endhead
+\textbf{Identification} & Nom du cas, \textbf{but}, acteur principal, acteurs secondaires ; date, version, responsable si demandés.\\
+\textbf{Déclencheur} & Événement \emph{qui commence} le cas : « Le concurrent demande une inscription sur internet. »\\
+\textbf{Préconditions} & Ce qui doit déjà être vrai \emph{avant de commencer}. Exemple : l'épreuve a été créée et publiée dans le système.\\
+\textbf{Enchaînement nominal} & Étapes numérotées acteur/système, jusqu'au succès. Dire \emph{qui fait quoi} à chaque étape.\\
+\textbf{Enchaînements alternatifs} & Autre chemin possible, avec une référence à l'étape où il démarre : paiement par chèque, profil déjà connu, inscription par club.\\
+\textbf{Exceptions} & Échec et réponse du système : quota atteint, paiement refusé, pièce non conforme. Écrire si on reprend le scénario ou s'il s'arrête.\\
+\textbf{Postconditions} & Ce qui est vrai \emph{après le cas} ; distinguer \textbf{succès}, \textbf{échec} et parfois \textbf{dossier en cours}.\\
+\textbf{Rubriques optionnelles} & Règles métier (tarif, âge, délai), exigences non fonctionnelles (confidentialité, fiabilité), IHM et hypothèses notées H1, H2.\\
+\bottomrule
+\end{longtable}
+\begin{memo}
+\textbf{Précondition vs garde vs postcondition :}\newline
+Précondition : « L'épreuve existe avant le début du cas. »\newline
+Garde/contrôle pendant le scénario : « [places disponibles ET date au plus tard J--15] ».\newline
+Postcondition : « L'inscription est DEFINITIVE » \emph{ou} « la demande est ANNULEE ».\newline
+\textbf{Piège :} le quota et la limite de date sont des règles à \emph{tester}, pas seulement des préconditions cachées : sinon on oublie la branche de refus.
+\end{memo}
+\subsection{Exemple complet corrigé : « S'inscrire à une course sur internet »}
+\begin{exobox}
+\textbf{Identification}\newline
+\textbf{Nom :} S'inscrire sur internet. \textbf{But :} obtenir une inscription définitive à une course.\newline
+\textbf{Principal :} Concurrent, pour une course individuelle. \textbf{Secondaires :} Banque (paiement par carte) et Secrétariat (chèque et certificat).\newline
+\textbf{Déclencheur :} Le concurrent demande à participer à une course depuis le site.\newline
+\textbf{Préconditions :} La course existe et le système d'inscription est accessible. \emph{Le nombre de places et la date limite seront vérifiés dans le déroulement.}
+\end{exobox}
+\textbf{Enchaînement nominal (course individuelle, paiement par carte) :}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Le concurrent choisit la course. Le système affiche les conditions et le tarif.
+\item Le système vérifie \textbf{le quota}, \textbf{la date} (au plus tard J--15) et \textbf{l'âge} lié à l'épreuve.
+\item Le concurrent indique son identité et ses coordonnées. Le système retrouve les informations connues, si elles existent.
+\item Le système enregistre la \texttt{PREINSCRIPTION}.
+\item Le concurrent choisit de payer par carte. Le système transmet le paiement à la banque.
+\item La banque donne son accord. Le système valide l'inscription financière : statut \texttt{FINANCIERE}.
+\item Le concurrent envoie un certificat médical de moins d'un an \textbf{par courrier}. Le secrétariat reçoit et contrôle la pièce.
+\item Le secrétariat valide la conformité. Le système place le dossier en \texttt{DEFINITIVE} et informe le concurrent.
+\end{enumerate}
+\textbf{Alternatives (avec point de retour) :}
+\begin{itemize}
+\item \textbf{A1, étape 3 : profil déjà connu.} Le système réutilise les données, le concurrent les vérifie, puis retour à l'étape 4. \textbf{La pièce médicale reste à contrôler.}
+\item \textbf{A2, étapes 5--6 : paiement par chèque.} Le concurrent envoie son chèque par courrier. Le secrétariat vérifie qu'il est conforme. Si oui, retour à l'étape 7 ; le statut reste \texttt{PREINSCRIPTION} tant que le paiement n'est pas validé.
+\item \textbf{A3, étapes 3--8 : triathlon / vélo.} \textbf{Le Club} inscrit son membre. Il doit être un club de la discipline. \textbf{La licence remplace le certificat médical.} Aucune inscription sur place pour ces disciplines.
+\end{itemize}
+\textbf{Exceptions (avec effet sur les données) :}
+\begin{itemize}
+\item \textbf{E1, étape 2 :} \texttt{[quota atteint OU date après J--15 OU non admissible]}. La demande est refusée avant création de préinscription ; le système explique pourquoi.
+\item \textbf{E2, étape 6 :} \texttt{[paiement non valide]}. L'inscription est \texttt{ANNULEE} et le concurrent est prévenu, comme le dit le sujet.
+\item \textbf{E3, étape 8 :} \texttt{[certificat non conforme]}. L'inscription est \texttt{ANNULEE} et le concurrent est prévenu.
+\end{itemize}
+\textbf{Postconditions :}
+\begin{itemize}
+\item \textbf{Succès :} une \texttt{Inscription} existe au statut \texttt{DEFINITIVE}, rattachée à une \texttt{Epreuve} et un \texttt{Concurrent} ; le paiement et le justificatif sont acceptés.
+\item \textbf{Intermédiaire :} le dossier peut être en attente de chèque ou de certificat. Il reste au stade de préinscription ou d'inscription financière.
+\item \textbf{Échec :} aucune préinscription si E1 ; inscription \texttt{ANNULEE} et information envoyée si E2 ou E3.
+\end{itemize}
+\textbf{Règles métier :} 16 ans minimum pour une course libre, 18 pour le semi-marathon, 20 pour le marathon ; club spécialisé pour triathlon/vélo ; quota non dépassé ; limite J--15 ; certificat de moins d'un an pour les courses individuelles. \textbf{Exigence non fonctionnelle (proposition, non imposée mot à mot) :} protéger les données personnelles et médicales.
+\begin{warningbox}
+\textbf{Ne pas inventer dans ce cas :} un \textit{after(24 h)}, un débit différé après validation du gestionnaire, ou un téléchargement obligatoire du certificat sur le site. Ces éléments apparaissent dans \emph{d'autres} études de cas, \textbf{pas} dans le parcours internet du TD courses de fond.
+\end{warningbox}
+\subsection{Les trois voies : surtout ne pas les mélanger}
+\begin{tabularx}{\linewidth}{@{}p{28mm}XXX@{}}
+\toprule
+Critère & Internet & Sur place & Courrier \\
 \midrule
-Nom et but & « Réserver une séance » ; valeur obtenue par l'acteur. \\
-Acteur principal & Qui commence et reçoit le service ? \\
-Acteurs secondaires & Banque, service partenaire\ldots\ si sollicités. \\
-Déclencheur & Événement qui démarre le cas. \\
-Préconditions & Conditions vraies \emph{avant} le cas (ex. session ouverte). \\
-Scénario nominal & Étapes numérotées acteur/système jusqu'au succès. \\
-Alternatives & Chemins possibles différents mais prévus. \\
-Exceptions & Erreurs, échecs, indisponibilités ; sortie ou reprise. \\
-Postconditions & État des données en réussite et en échec. \\
-Règles / hypothèses & Délais, contrôles et décisions non précisées. \\
+Qui saisit ? & Concurrent ; club pour triathlon/vélo & Secrétariat (H1) & Secrétariat (H1), à la réception\\
+Date clé & Préinscription au plus tard J--15 & Terminer \textbf{1 h avant départ} & Terminer au plus tard J--5\\
+Règlement & Carte ou chèque & Espèces, carte ou chèque & Chèque / règlement envoyé\\
+Pièce & Certificat envoyé par courrier ; licence si club & Certificat contrôlé à nouveau & Certificat joint ; licence si club\\
+Pièce manquante & Le dossier attend la suite des étapes si possible & Les 3 étapes doivent être validées & Reste à PREINSCRIPTION ou FINANCIERE ; lettre de relance\\
+Triathlon/vélo & Par club & \textbf{Interdit} & Par club\\
 \bottomrule
 \end{tabularx}
-\begin{exobox}
-\textbf{Extrait -- Réserver une place payante}\\
-1. Le client choisit la séance ; 2. le système vérifie les places ; 3. le client valide ses coordonnées ; 4. le système demande une autorisation au prestataire ; 5. le prestataire accepte ; 6. le système met la demande en attente ; 7. un responsable confirme ; 8. le système débite la somme et confirme la place.\\
-\textbf{A1 :} plus de places \(\rightarrow\) proposer une autre séance.\\
-\textbf{E1 :} autorisation refusée \(\rightarrow\) aucun débit, message d'erreur.\\
-\textbf{A2 :} responsable refuse \(\rightarrow\) lever l'autorisation, notifier.\\
-\textbf{A3 :} aucun avis à l'échéance \(\rightarrow\) annuler/expirer selon la règle fournie.\\
-\textbf{Postcondition :} pas de réservation confirmée sans décision et débit validé.
-\end{exobox}
-\begin{warningbox}
-Une \emph{précondition} n'est pas une étape du scénario. Une \emph{postcondition} décrit le résultat dans le système, pas une promesse vague comme « l'utilisateur est content ». Les branches alternatives doivent se retrouver dans la séquence N1.
-\end{warningbox}
+\textbf{Passage au diagramme N1 :} chaque étape est un message, chaque A1--A3 ou E1--E3 devient une branche \texttt{alt}/\texttt{opt}/\texttt{break} lorsque c'est pertinent. En N3, la vue transmet au contrôle et les entités effectuent les règles métier.\newline
+\source{ASI\_C1, page 36 (modèle du retrait d'argent) ; Organisation de courses de fond, pages 3--4 ; ASI\_C5, pages 4--5 et 9.}
 
 \section{Séquence système N1 : un système en boîte noire}
 \subsection{Ce qu'il faut dessiner}

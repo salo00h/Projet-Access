@@ -134,13 +134,14 @@ Maquette & Éléments visibles \\
 \end{tabularx}
 \newpage
 \section{Questions -- 20 points}
-\subsection*{Question 1 -- 4 points : besoins et séquence N1}
+\subsection*{Question 1 -- 5 points : cas, description textuelle et N1}
 \begin{enumerate}[label=\alph*)]
-\item Construisez le \textbf{diagramme de cas d'utilisation} avec les acteurs importants et un découpage fonctionnel en paquetages. Justifiez au moins une relation \texttt{extend} ou \texttt{include} si vous en utilisez. (1,5 pt)
+\item Construisez le \textbf{diagramme de cas d'utilisation} avec les acteurs importants et un découpage fonctionnel en paquetages. Justifiez au moins une relation \texttt{extend} ou \texttt{include} si vous en utilisez. (1 pt)
+\item Donnez la \textbf{description textuelle détaillée} de « Réserver un studio en ligne » : nom, but, acteurs, déclencheur, préconditions, déroulement normal, alternatives, exceptions et postconditions. (1,5 pt)
 \item Construisez le \textbf{diagramme de séquence système N1} de « Réserver un studio en ligne », depuis la recherche jusqu'à la décision du gestionnaire. Montrez : absence de places, adhésion suspendue, autorisation refusée, validation, refus, expiration après 12 h ; distinguez clairement autorisation et débit. (2,5 pts)
 \end{enumerate}
-\subsection*{Question 2 -- 6 points : classes du domaine et paquetages}
-Proposez le diagramme de classes \textbf{du domaine}, avec classes, attributs, opérations utiles et multiplicités \emph{aux deux bouts}. Représentez les équipements réservés et les lignes de factures. Ajoutez un découpage en paquetages sans cycle. Expliquez ce que vous laissez hors du domaine. (6 pts)
+\subsection*{Question 2 -- 5 points : classes du domaine et paquetages}
+Proposez le diagramme de classes \textbf{du domaine}, avec classes, attributs, opérations utiles et multiplicités \emph{aux deux bouts}. Représentez les équipements réservés et les lignes de factures. Ajoutez un découpage en paquetages sans cycle. Expliquez ce que vous laissez hors du domaine. (5 pts)
 \subsection*{Question 3 -- 3 points : états}
 Construisez le \textbf{diagramme d'états d'une demande de réservation} depuis son enregistrement jusqu'à la fin de la séance. Il doit contenir tous les statuts cités, les décisions, le \texttt{after(12 h)}, la limite d'annulation de 24 h, les branches d'erreur et la notation \texttt{événement [condition] / action}. Donnez l'attribut et son énumération dans la classe métier. (3 pts)
 \subsection*{Question 4 -- 3 points : DCP}
@@ -198,6 +199,35 @@ Il existe plusieurs solutions correctes. Voici un \textbf{modèle de référence
 \begin{warningbox}
 Il serait faux de dessiner « Saisir heure », « Cliquer confirmer », « Débiter carte », « Enregistrer ligne de table » comme quatre objectifs principaux du membre. Ce sont des étapes ou des responsabilités internes.
 \end{warningbox}
+
+\subsection{Description textuelle complète de « Réserver un studio en ligne »}
+\begin{tabularx}{\linewidth}{@{}p{37mm}X@{}}
+\toprule
+Nom et but & Réserver un studio en ligne : obtenir une réservation confirmée et payée pour un créneau précis.\\
+Acteur principal & Membre avec adhésion active.\\
+Acteurs secondaires & Prestataire de paiement, GestionnaireSite, ServiceCourriel.\\
+Déclencheur & Le membre recherche un studio et veut le réserver.\\
+Préconditions & Studio et membre référencés ; portail en service. Le statut d'adhésion et le créneau libre seront \emph{contrôlés} dans le scénario.\\
+Postcondition succès & La demande passe de \texttt{EN\_ATTENTE} à \texttt{CONFIRMEE}, le paiement est débité, facture émise, membre averti.\\
+Postcondition échec & Autorisation refusée : aucune demande créée. Refus ou expiration après la demande : autorisation levée et état \texttt{REFUSEE} ou \texttt{EXPIREE}.\\
+\bottomrule
+\end{tabularx}
+\textbf{Scénario nominal (étapes numérotées) :}
+\begin{enumerate}
+\item Le membre saisit site, date, heure, durée et type ; le système cherche les créneaux libres.
+\item Le système affiche les studios libres. Le membre choisit un studio et ses équipements.
+\item Le système contrôle l'adhésion active et l'absence de maintenance ou de conflit, puis calcule le prix total.
+\item Le système affiche le récapitulatif. Le membre confirme et demande le paiement.
+\item Le prestataire accepte \textbf{l'autorisation} du montant, sans débit immédiat.
+\item Le système crée une demande \texttt{EN\_ATTENTE} et informe le membre de sa réception.
+\item Le gestionnaire vérifie la demande et valide avant 12 heures, si le créneau est encore libre.
+\item Le système fait \textbf{débiter} l'autorisation, passe la réservation à \texttt{CONFIRMEE}, émet la facture et informe le membre.
+\end{enumerate}
+\textbf{Alternatives et exceptions :} \textbf{A1 [étape 1]} aucun créneau : afficher l'indisponibilité, reprendre la recherche. \textbf{E1 [étape 3]} adhésion suspendue ou ressource en maintenance : refuser la demande. \textbf{E2 [étape 5]} autorisation de paiement refusée : erreur affichée, aucune demande enregistrée. \textbf{A2 [étape 7]} gestionnaire refuse ou constate un conflit : \texttt{REFUSEE}, lever l'autorisation, avertir. \textbf{A3 [étape 7]} aucune décision pendant 12 heures : \texttt{EXPIREE}, lever l'autorisation, avertir. \textbf{E3 [étape 8]} débit exceptionnellement refusé malgré l'autorisation initiale : le traitement d'erreur est une hypothèse H4 et ne doit pas aboutir à une fausse confirmation.
+\begin{warningbox}
+La \textbf{précondition} n'est pas « adhésion déjà vérifiée et places déjà libres » si ces échecs doivent apparaître dans la N1. Et la \textbf{postcondition d'échec} n'est pas « réservation confirmée » !
+\end{warningbox}
+\textbf{Barème pédagogique Q1 :} cas et rôles (1 pt), description textuelle détaillée (1,5 pt), N1 et tous ses chemins (2,5 pts).
 
 \subsection{Séquence N1 de la réservation}
 Le schéma ci-dessous est une \textbf{version compacte}. Les messages numérotés et les branches qui suivent en font partie ; la N1 représente le système par \emph{une seule} ligne de vie.
@@ -336,7 +366,7 @@ Les dépendances vont du paquetage utilisateur vers celui dont il reprend les co
 \item \texttt{ServiceCourrielExterne} : acteur secondaire du système dans les cas/N1 ; ne créer une classe \texttt{Notification} que si le domaine exige un historique propre des envois.
 \end{itemize}
 \begin{answerbox}
-\textbf{Barème pédagogique Q2 :} bons concepts et opérations (2 pts), multiplicités et contraintes (2 pts), facture/sélection (1 pt), paquetages sans cycle et exclusions argumentées (1 pt).
+\textbf{Barème pédagogique Q2 :} bons concepts et opérations (1,5 pt), multiplicités et contraintes (1,5 pt), facture/sélection (1 pt), paquetages sans cycle et exclusions argumentées (1 pt).
 \end{answerbox}
 
 \section{Corrigé Q3 : diagramme d'états complet}
