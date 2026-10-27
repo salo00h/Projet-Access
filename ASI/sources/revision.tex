@@ -1,0 +1,542 @@
+
+\documentclass[10pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\setsansfont{Carlito}
+\usepackage[french]{babel}
+\usepackage[a4paper,margin=18mm,headheight=17pt,footskip=12mm]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\definecolor{navy}{HTML}{153F56}
+\definecolor{teal}{HTML}{157A86}
+\definecolor{pale}{HTML}{EDF6F7}
+\definecolor{warm}{HTML}{FFF4E4}
+\definecolor{redsoft}{HTML}{FCECEC}
+\definecolor{bodygray}{HTML}{445866}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=teal,urlcolor=teal,pdftitle={Analyse des SI - Révision et examen blanc}}
+\usepackage{booktabs,tabularx,longtable,array,multicol}
+\renewcommand{\arraystretch}{1.25}
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*,itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=4pt}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,shapes.geometric,backgrounds}
+\usepackage[most]{tcolorbox}
+\tcbset{before skip=7pt,after skip=7pt,colback=pale,colframe=teal!40,arc=2mm,boxrule=.6pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{memo}[1][]{colback=pale,colframe=teal,title={À retenir},fonttitle=\bfseries,#1}
+\newtcolorbox{warningbox}[1][]{colback=warm,colframe=orange!55!black,title={Piège à éviter},fonttitle=\bfseries,#1}
+\newtcolorbox{exobox}[1][]{colback=white,colframe=navy!40,title={Exemple difficile},fonttitle=\bfseries,#1}
+\newtcolorbox{answerbox}[1][]{colback=pale,colframe=teal!40,title={Justification / réponse},fonttitle=\bfseries,#1}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection.}{.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{navy}}{\thesubsubsection}{.6em}{}
+\titlespacing*{\section}{0pt}{17pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+\usepackage{fancyhdr,lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{bodygray} M2 SIA -- Analyse des SI d'entreprise}
+\fancyhead[R]{\footnotesize\color{bodygray} Révision UML}
+\fancyfoot[L]{\footnotesize\color{bodygray} Support indépendant basé sur les cours 2026-2027}
+\fancyfoot[R]{\footnotesize\color{bodygray} \thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{.35pt}
+\color{navy}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newcommand{\tagword}[1]{\textcolor{teal}{\textbf{#1}}}
+\newcommand{\good}{\textcolor{teal}{\textbf{OK}}}
+\newcommand{\bad}{\textcolor{red!70!black}{\textbf{ERREUR}}}
+\newcommand{\source}[1]{\par{\footnotesize\color{bodygray}\textit{Repère cours : #1}}}
+\newcommand{\sep}{\smallskip\hrule\smallskip}
+\tikzset{
+ actor/.style={draw=navy,rounded corners=1pt,minimum width=16mm,minimum height=8mm,fill=white,font=\scriptsize,align=center},
+ usecase/.style={draw=teal,ellipse,minimum width=27mm,minimum height=11mm,fill=pale,font=\scriptsize,align=center},
+ cbox/.style={draw=teal,rounded corners=2pt,fill=pale,minimum width=26mm,minimum height=9mm,align=center,font=\scriptsize},
+ dbox/.style={draw=teal,rectangle,fill=pale,minimum width=24mm,minimum height=8mm,align=center,font=\scriptsize},
+ assoc/.style={-Stealth,draw=navy,thick},
+ umlarrow/.style={-Stealth,draw=navy,dashed},
+ life/.style={draw=bodygray,densely dashed},
+ state/.style={draw=teal,rounded corners=4pt,fill=pale,minimum width=28mm,minimum height=11mm,align=center,font=\scriptsize}
+}
+\newcommand{\cover}[3]{
+\thispagestyle{empty}
+\vspace*{27mm}
+{\color{teal}\rule{25mm}{3pt}}\par\vspace{12mm}
+{\huge\bfseries\color{navy} #1\par}
+\vspace{5mm}{\Large\color{teal}#2\par}
+\vspace{13mm}\begin{tcolorbox}[colback=pale,colframe=teal!40,boxrule=.3pt]
+#3
+\end{tcolorbox}
+\vfill
+{\small\color{bodygray} Master 2 -- Systèmes d'information avancés\\
+Analyse des SI d'entreprise -- iaelyon / Université Jean Moulin Lyon 3\\
+Document d'entraînement original, non officiel -- octobre 2026}
+\newpage
+}
+
+\begin{document}
+\cover{Réviser toute l'analyse des SI}{Cours clair + cas difficiles + schémas UML}{\textbf{Objectif :} savoir lire une étude de cas longue, choisir les bons concepts, construire les diagrammes et expliquer ses choix en français simple.\\[3pt]
+\textbf{Priorité pour l'écrit :} cas d'utilisation, séquence système N1, classes du domaine et paquetages, états, DCP, séquence N3 (MVC).\\[3pt]
+\textbf{Compléments utiles :} description textuelle, activité, communication, démarche de projet, Scrum, vision, exigences, IA et SAFe.}
+\tableofcontents
+\newpage
+
+\section{Ce que demande vraiment l'examen}
+\begin{memo}
+La séance 5 annonce un \textbf{examen écrit de 3 heures, 20 points, 5 questions, avec six fiches de diagrammes}. Les documents de cours sont autorisés. Le projet en groupe compte aussi pour 50\% de l'évaluation de l'UE. Le plan exact d'un futur sujet peut varier : ne mémorisez pas un seul cas.
+\end{memo}
+\begin{tabularx}{\linewidth}{@{}p{39mm}X@{}}
+\toprule
+Livrable central & Question à laquelle le diagramme répond \\
+\midrule
+Cas d'utilisation & Qui veut faire quoi avec le système ? \\
+Séquence système N1 & Quels messages passent entre acteurs et système ? \\
+Classes du domaine & Quels objets métier existent ? Quelles règles les lient ? \\
+Paquetages & Comment ranger les classes sans dépendances circulaires ? \\
+États & Comment une inscription, réservation, compte\ldots\ change d'état ? \\
+DCP & Quelles classes de dialogue, contrôle et entité participent à un cas ? \\
+Séquence N3 & Comment ces participants collaborent-ils dans le temps ? \\
+\bottomrule
+\end{tabularx}
+
+\textbf{Autres notions du cours :} diagramme d'activité, diagramme de communication, modèle MVC, processus unifié, document de vision, risques, Scrum, exigences non fonctionnelles, usage critique de l'IA et architecture C4. Elles sont utiles dans les TD, le projet et les justifications. Le \textit{diagramme de communication} n'apparaît pas parmi les six fiches ciblées pour l'écrit, mais figure dans le TD « Organisation de courses de fond ».
+
+\subsection{Méthode de gestion du temps (conseil d'entraînement)}
+\begin{enumerate}
+\item Lire \textbf{tout} le sujet et ses questions avant de dessiner (15 min).
+\item Extraire les mots du métier, les rôles, les événements et les règles au brouillon (15 min).
+\item Traiter les questions demandées ; commencer par la question 2 est le conseil explicite de la séance 5.
+\item Écrire toute hypothèse avec un numéro : H1, H2\ldots
+\item Garder les \textbf{15 dernières minutes} pour les multiplicités, branches d'erreur et cohérences entre diagrammes.
+\end{enumerate}
+\source{ASI\_C5, pages 2, 7--14 et 23.}
+
+\section{Lire un très long énoncé sans se perdre}
+\subsection{La méthode des cinq questions}
+\begin{tabularx}{\linewidth}{@{}p{26mm}p{42mm}X@{}}
+\toprule
+Question & À extraire & Exemple (« centre de formation ») \\
+\midrule
+Qui ? & Acteurs, rôles externes & Élève, secrétaire, banque \\
+Quoi ? & Objectifs métier & S'inscrire à une session \\
+Quelles données ? & Noms du métier & Session, Inscription, Paiement \\
+Quand ? & États, événements, délais & En attente, validée, after(48 h) \\
+Quelle règle ? & Gardes, calculs, exceptions & Places limitées, certificat obligatoire \\
+\bottomrule
+\end{tabularx}
+\begin{exobox}
+« Un étudiant demande une place. La banque autorise la somme sans la débiter. Un responsable valide sous 48 h. Sinon, la demande expire. Un étudiant sur liste d'attente peut recevoir une nouvelle proposition. »\\
+\textbf{Acteurs :} étudiant, responsable, banque (si externe).\\
+\textbf{Classes candidates :} Étudiant, Session, Demande, AutorisationPaiement, Offre.\\
+\textbf{États :} EnAttente, Confirmée, Refusée, Expirée ; des états de liste d'attente sont à justifier selon le périmètre.\\
+\textbf{Règles :} pas de débit avant validation, délai de 48 h, gestion des places.
+\end{exobox}
+\begin{warningbox}
+Ne copiez pas tous les noms en classes. « Bouton », « écran », « base de données », « email » (sans historique requis), « disponibilité » calculée : souvent des \textbf{faux candidats}. Le modèle du domaine parle du métier, pas de l'interface.
+\end{warningbox}
+
+\subsection{Construire une petite matrice de traçabilité}
+\begin{tabularx}{\linewidth}{@{}p{27mm}p{31mm}X@{}}
+\toprule
+Exigence & Modèles concernés & Contrôle de cohérence \\
+\midrule
+Inscription avec paiement & UC, N1, classes, N3 & Même événement et même ordre d'autorisation. \\
+Délai de 48 h & États, N1, règles & \texttt{after(48 h)}, annulation et résultat expliqués. \\
+Certificat manquant & Texte, N1, N3, états & Branche d'erreur partout où elle compte. \\
+Recherche d'une place & UC, DCP, N3 & Même nom de classe métier. \\
+\bottomrule
+\end{tabularx}
+
+\section{Cas d'utilisation : objectifs et acteurs}
+\subsection{Le bon raisonnement}
+Un \textbf{acteur} est un rôle \emph{extérieur} au système étudié. Un acteur principal reçoit le service ; un acteur secondaire aide à le fournir (par exemple une banque ou un serveur externe). La même personne peut jouer plusieurs rôles. Un terminal ou une borne peut être un acteur si elle dialogue avec le système depuis l'extérieur de sa frontière.
+
+Un \textbf{cas d'utilisation} est un objectif métier complet : « Réserver un atelier », « Terminer une réparation ». Il ne faut pas transformer « saisir le prénom » ou « cliquer sur OK » en cas autonome sans raison métier.
+
+\begin{center}
+\begin{tikzpicture}[node distance=20mm]
+\node[actor] (client) {Client};
+\node[usecase,right=21mm of client] (res) {Réserver\\un atelier};
+\node[usecase,below=13mm of res] (ann) {Annuler\\une réservation};
+\node[actor,right=25mm of res] (pay) {Banque\\externe};
+\node[draw=teal,inner sep=8mm,fit=(res)(ann),label={[font=\scriptsize]above:Système de réservation}] (frame) {};
+\draw[-,thick] (client) -- (res);\draw[-,thick] (client) -- (ann);\draw[-,thick] (res) -- (pay);
+\end{tikzpicture}
+\end{center}
+\subsection{\texttt{include}, \texttt{extend}, généralisation}
+\begin{center}
+\begin{tikzpicture}[node distance=10mm and 27mm]
+\node[usecase] (a) {Finaliser\\une commande};
+\node[usecase,right=33mm of a] (b) {Vérifier\\le panier};
+\draw[umlarrow] (a) -- node[above,font=\scriptsize]{\guillemotleft include\guillemotright} (b);
+\node[usecase,below=21mm of a] (c) {Ajouter\\une garantie};
+\node[usecase,right=33mm of c] (d) {Réserver\\un équipement};
+\draw[umlarrow] (c) -- node[above,font=\scriptsize]{\guillemotleft extend\guillemotright} (d);
+\end{tikzpicture}
+\end{center}
+\textbf{Include :} le cas de base appelle obligatoirement un comportement réutilisable ; \textbf{la flèche pointe vers le cas inclus}.\\
+\textbf{Extend :} comportement complémentaire activé sous condition ; \textbf{la flèche pointe vers le cas de base}.\\
+\textbf{Généralisation :} le rôle spécialisé hérite des interactions du rôle général ; triangle blanc vers le rôle général.
+\begin{warningbox}
+Une étape obligatoire n'est pas automatiquement un \texttt{include}. Le professeur sanctionne les \texttt{include} créés seulement pour découper chaque clic. La règle « paiement toujours réalisé » dépend du scénario : \emph{autorisation} et \emph{débit} ne sont pas la même chose.
+\end{warningbox}
+\begin{exobox}
+Un gérant est aussi mécanicien et peut acheter comme client. On peut représenter \texttt{Gérant} et \texttt{Mécanicien} comme des \emph{rôles}, avec leurs cas propres. On ne crée pas un cas \emph{Créer un gérant} sauf objectif métier réel. Une machine qui envoie ses mesures peut être acteur secondaire si elle est hors frontière du système.
+\end{exobox}
+\source{ASI\_C1, partie cas d'utilisation ; ASI\_C5, page 8 ; TD Station multi-énergies et Agence de voyages.}
+
+\section{Description textuelle d'un cas : le contrat du scénario}
+\subsection{Gabarit complet à copier}
+\begin{tabularx}{\linewidth}{@{}p{37mm}X@{}}
+\toprule
+Champ & Contenu attendu \\
+\midrule
+Nom et but & « Réserver une séance » ; valeur obtenue par l'acteur. \\
+Acteur principal & Qui commence et reçoit le service ? \\
+Acteurs secondaires & Banque, service partenaire\ldots\ si sollicités. \\
+Déclencheur & Événement qui démarre le cas. \\
+Préconditions & Conditions vraies \emph{avant} le cas (ex. session ouverte). \\
+Scénario nominal & Étapes numérotées acteur/système jusqu'au succès. \\
+Alternatives & Chemins possibles différents mais prévus. \\
+Exceptions & Erreurs, échecs, indisponibilités ; sortie ou reprise. \\
+Postconditions & État des données en réussite et en échec. \\
+Règles / hypothèses & Délais, contrôles et décisions non précisées. \\
+\bottomrule
+\end{tabularx}
+\begin{exobox}
+\textbf{Extrait -- Réserver une place payante}\\
+1. Le client choisit la séance ; 2. le système vérifie les places ; 3. le client valide ses coordonnées ; 4. le système demande une autorisation au prestataire ; 5. le prestataire accepte ; 6. le système met la demande en attente ; 7. un responsable confirme ; 8. le système débite la somme et confirme la place.\\
+\textbf{A1 :} plus de places \(\rightarrow\) proposer une autre séance.\\
+\textbf{E1 :} autorisation refusée \(\rightarrow\) aucun débit, message d'erreur.\\
+\textbf{A2 :} responsable refuse \(\rightarrow\) lever l'autorisation, notifier.\\
+\textbf{A3 :} aucun avis à l'échéance \(\rightarrow\) annuler/expirer selon la règle fournie.\\
+\textbf{Postcondition :} pas de réservation confirmée sans décision et débit validé.
+\end{exobox}
+\begin{warningbox}
+Une \emph{précondition} n'est pas une étape du scénario. Une \emph{postcondition} décrit le résultat dans le système, pas une promesse vague comme « l'utilisateur est content ». Les branches alternatives doivent se retrouver dans la séquence N1.
+\end{warningbox}
+
+\section{Séquence système N1 : un système en boîte noire}
+\subsection{Ce qu'il faut dessiner}
+Des lignes de vie pour les acteurs extérieurs et \textbf{une seule pour le système étudié}. Les \emph{messages} vont dans l'ordre chronologique. Les réponses importantes apparaissent en pointillés. Aucun écran, contrôleur, DAO ou base interne.
+
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=.72cm]
+\foreach \x/\txt in {0/Client,4/Système,8/Banque} {
+ \node[dbox,minimum width=23mm] at (\x,0) {\txt};
+ \draw[life] (\x,-.45)--(\x,-6.5);
+}
+\draw[assoc] (0,-1) -- node[above,font=\scriptsize]{1: demanderRéservation()} (4,-1);
+\draw[assoc] (4,-2) -- node[above,font=\scriptsize]{2: autoriser(montant)} (8,-2);
+\draw[<- ,dashed] (4,-3) -- node[above,font=\scriptsize]{3: accepté/refusé} (8,-3);
+\draw[teal,thick] (3.4,-3.5) rectangle (8.6,-5.5);
+\node[font=\scriptsize,anchor=north west] at (3.5,-3.5) {alt [autorisation OK] / [refusée]};
+\draw[<- ,dashed] (0,-4.2) -- node[above,font=\scriptsize]{4a: demande en attente} (4,-4.2);
+\draw[<- ,dashed] (0,-5) -- node[above,font=\scriptsize]{4b: refus du paiement} (4,-5);
+\end{tikzpicture}
+\end{center}
+\subsection{Fragments combinés : choisir correctement}
+\begin{tabularx}{\linewidth}{@{}p{18mm}p{35mm}X@{}}
+\toprule
+Fragment & Utilité & Exemple \\
+\midrule
+\texttt{alt} & Plusieurs issues exclusives & [paiement OK] / [paiement refusé] \\
+\texttt{opt} & Issue conditionnelle unique & [client demande un reçu] \\
+\texttt{loop} & Répétition & [pour chaque exemplaire], scanner \\
+\texttt{break} & Fin anticipée du scénario & [carte inconnue], stopper l'emprunt \\
+\texttt{par} & Branches en parallèle & Deux vérifications indépendantes (si justifié) \\
+\bottomrule
+\end{tabularx}
+\begin{exobox}
+La médiathèque vérifie chaque objet apporté. Un objet dépassant le quota est ignoré mais le suivant est testé. Il faut \texttt{loop} sur les objets et, \emph{à l'intérieur}, \texttt{alt} [quota OK] / [quota atteint]. Ce n'est pas un \texttt{break} global : le cas continue avec l'objet suivant.
+\end{exobox}
+\source{ASI\_C1, section séquences ; ASI\_C5, page 9 ; Exercices\_03, emprunts du tiers-lieu culturel.}
+
+\section{Diagramme d'activité : flux de travail et partitions}
+Un diagramme d'activité montre les \textbf{actions et décisions} d'un processus. Il est utile pour une inscription en trois étapes ou un prêt de plusieurs objets.
+\begin{center}
+\begin{tikzpicture}[node distance=8mm and 15mm]
+\node[circle,fill=navy,inner sep=3pt] (start) {};
+\node[cbox,below=of start] (s) {Recevoir la demande};
+\node[diamond,draw=teal,aspect=2.5,below=of s,inner sep=1pt,fill=pale,font=\scriptsize] (d) {Dossier valide ?};
+\node[cbox,below left=13mm and 19mm of d] (bad) {Demander les pièces};
+\node[cbox,below right=13mm and 19mm of d] (good) {Enregistrer};
+\node[circle,draw=navy,thick,minimum size=7mm,below=28mm of d] (end) {};
+\node[circle,fill=navy,inner sep=2pt] at (end.center) {};
+\draw[assoc] (start)--(s);\draw[assoc] (s)--(d);
+\draw[assoc] (d)--node[above left,font=\scriptsize]{[non]}(bad);
+\draw[assoc] (d)--node[above right,font=\scriptsize]{[oui]}(good);
+\draw[assoc] (bad)|-(end);\draw[assoc] (good)|-(end);
+\end{tikzpicture}
+\end{center}
+\textbf{Initial/final :} point noir / point noir cerclé. \textbf{Action :} rectangle arrondi. \textbf{Décision :} losange avec gardes [ ]. \textbf{Fork/Join :} barres épaisses pour créer puis synchroniser deux branches. \textbf{Partitions (swimlanes) :} séparer les actions du client, du secrétariat, de la banque.
+\begin{warningbox}
+\emph{Décision} (un seul chemin choisi) \(\neq\) \emph{fork} (plusieurs chemins en parallèle). Un join attend normalement les branches du fork ; n'en ajoutez pas pour un simple choix oui/non.
+\end{warningbox}
+\source{ASI\_C1, diagrammes d'activité et partitions ; cas Cloud gaming et projet.}
+
+\section{Classes du domaine : le chapitre qui piège le plus}
+\subsection{Classe ou attribut ? Les six tests du cours}
+Pour chaque nom extrait du texte, demandez-vous : (1) plusieurs exemplaires ? (2) données propres ? (3) cycle de vie propre ? (4) ensemble fermé de valeurs ? (5) information portée par le \emph{lien} ? (6) identité propre du lien ? Ces tests orientent vers classe, attribut, énumération, classe d'association ou classe ordinaire.
+
+\begin{tabularx}{\linewidth}{@{}p{38mm}X@{}}
+\toprule
+Expression du texte & Choix raisonnable / justification \\
+\midrule
+Date de début & Attribut de Réservation : valeur simple. \\
+Statut = {attente, OK, refus} & Énumération ; mêmes valeurs que dans les états. \\
+Tarif par catégorie et durée & Classe Tarif : plusieurs attributs, évolue dans le métier. \\
+Date d'une inscription d'un élève à un cours & Attribut du lien si une seule inscription par couple ; classe autonome si plusieurs inscriptions, identité ou cycle de vie. \\
+Disponibilité & Calcul métier ; souvent \texttt{/disponible}, pas une classe. \\
+ÉcranRecherche / BaseDeDonnées & Hors du modèle métier ; elles reviennent en conception. \\
+\bottomrule
+\end{tabularx}
+\subsection{Attributs, opérations et visibilité}
+\textbf{Analyse :} nom métier, attributs utiles, opérations métier (\texttt{calculerPrix()}, \texttt{verifierEligibilite()}). \textbf{Conception :} types techniques, visibilité \texttt{+/-}, constructeur, accesseurs, dépendances techniques. Ne mettez pas par réflexe un \texttt{getNom()} ou une classe \texttt{DAO} dans le diagramme \emph{du domaine}.
+
+\subsection{Multiplicités à lire par l'autre extrémité}
+\begin{center}
+\begin{tikzpicture}
+\node[dbox] (ad) {Adhérent};\node[dbox,right=48mm of ad] (re) {Réservation};
+\draw[-,thick] (ad)--node[above,pos=.12,font=\scriptsize]{1}node[above,pos=.88,font=\scriptsize]{0..*}(re);
+\end{tikzpicture}
+\end{center}
+\textbf{Lecture :} pour \emph{une réservation}, \texttt{1} adhérent ; pour \emph{un adhérent}, \texttt{0..*} réservations.\\
+\texttt{0..1} facultatif unique ; \texttt{1..*} au moins une occurrence ; \texttt{2..5} borné ; \texttt{*} équivaut à \texttt{0..*}.
+
+\subsection{Association, héritage, agrégation, composition}
+\begin{itemize}
+\item \textbf{Association :} deux concepts sont liés (un étudiant suit un cours).
+\item \textbf{Généralisation / héritage :} « une Voiture est un Véhicule ». Triangle blanc vers la classe mère. Utiliser seulement si la substitution a du sens.
+\item \textbf{Composition :} losange noir côté \emph{tout}. Une ligne de facture n'a pas de vie autonome hors de la facture ; forte dépendance de cycle de vie.
+\item \textbf{Agrégation partagée :} losange blanc ; le composant peut exister ou être partagé indépendamment. À employer avec prudence : une simple association peut suffire.
+\item \textbf{Classe d'association :} le lien porte des attributs (ex. date d'affectation à une équipe). Si une même paire peut avoir plusieurs liens datés, préférer souvent une classe ordinaire identifiable.
+\end{itemize}
+\begin{center}
+\begin{tikzpicture}[node distance=19mm]
+\node[dbox] (f) {Facture};\node[dbox,right=43mm of f] (l) {LigneFacture};
+\draw[-,thick] (f) -- node[above,pos=.9,font=\scriptsize]{1..*} (l);
+\node[diamond,draw=navy,fill=navy,inner sep=2.4pt,rotate=90] at ($(f.east)+(3mm,0)$) {};
+\end{tikzpicture}
+\end{center}
+\begin{warningbox}
+Une classe « prix1, prix2, prix3 » cache une classe métier manquante. La composition ne se choisit pas avec l'intuition « contient ». Testez \textbf{destruction, partage, création}. Et renseignez \emph{les deux extrémités} de chaque association.
+\end{warningbox}
+\source{ASI\_C2, pages 5--30 ; ASI\_C5, page 11 ; TD application hôtelière et banque.}
+
+\section{Paquetages : découpage propre et dépendances}
+Un \textbf{paquetage} regroupe des concepts du même domaine de responsabilité. Un paquetage A dépend de B si A \emph{utilise} des classes de B. Le but est un modèle cohérent, avec peu de liens et \textbf{sans cycle de dépendances}.
+\begin{center}
+\begin{tikzpicture}[node distance=11mm and 19mm]
+\node[dbox,minimum width=29mm] (cli) {Clients};
+\node[dbox,right=of cli,minimum width=35mm] (res) {Réservations};
+\node[dbox,right=of res,minimum width=29mm] (pai) {Paiements};
+\draw[umlarrow] (res)--(cli); \draw[umlarrow] (pai)--(res);
+\end{tikzpicture}
+\end{center}
+Les flèches vont \emph{du paquetage utilisateur vers celui qui est utilisé}. L'exemple montre une orientation possible, pas une règle universelle sur les paiements.
+\begin{exobox}
+Un modèle place \texttt{Client} dans \texttt{FrontOffice}, \texttt{Paiement} dans \texttt{BackOffice}, \texttt{Réservation} dans \texttt{Mobile}. C'est fragile : un même concept métier serait dispersé selon les écrans. Meilleur principe : \emph{comptes}, \emph{réservations}, \emph{facturation}.\end{exobox}
+
+\section{Diagramme d'états : vrai cycle de vie}
+Un état décrit la situation \emph{durable} d'un objet (\texttt{EnAttente}, \texttt{Confirmée}). Une transition écrit \textbf{événement [garde] / action}. \texttt{after(durée)} représente l'écoulement du temps. Les états doivent être repris \textbf{mot pour mot} dans une énumération du domaine.
+\begin{center}
+\begin{tikzpicture}[node distance=14mm and 10mm]
+\node[circle,fill=navy,inner sep=2.5pt] (i) {};
+\node[state,right=of i] (a) {Préinscrite};
+\node[state,right=27mm of a] (p) {PaiementValidé};
+\node[state,right=26mm of p] (c) {Confirmée};
+\node[state,below=23mm of p] (x) {Annulée};
+\draw[assoc] (i)--(a);
+\draw[assoc] (a)--node[above,font=\scriptsize]{paiement accepté}(p);
+\draw[assoc] (p)--node[above,font=\scriptsize]{certificat conforme}(c);
+\draw[assoc] (p)--node[right,font=\scriptsize,align=left]{certificat refusé\\/ notifier()}(x);
+\draw[assoc] (a) to[bend right=20] node[below left,font=\scriptsize]{paiement refusé} (x);
+\end{tikzpicture}
+\end{center}
+\textbf{Attention, cas réel « Organisation de courses de fond » :} la préinscription ne peut commencer que si la capacité n'est pas atteinte, au plus tard 15 jours avant la course ; le paiement est contrôlé ; un certificat de moins d'un an valide l'inscription définitive. Pour le courrier, le dossier peut \textbf{rester} en préinscription ou inscription financière si une pièce manque. Pour le triathlon et le vélo, la licence remplace le certificat et l'inscription passe par le club. Un vrai schéma doit représenter ces retours et branches, sans inventer un parcours unique pour tout le monde.
+\begin{warningbox}
+Ne confondez pas \emph{événement} (« recevoir le paiement »), \emph{garde} (« [paiement valide] »), \emph{action} (« enregistrer le paiement ») et \emph{état} (« PaiementValidé »). Les flèches sans libellé font perdre des points. Ne supprimez pas les transitions de retour imposées par le texte.
+\end{warningbox}
+\source{ASI\_C2, partie états ; ASI\_C5, page 12 ; Organisation de courses de fond, pages 3--6.}
+
+\section{DCP : classes participantes au cas d'utilisation}
+Le \textbf{DCP} contient trois familles de classes, en restant lié à \emph{un cas} :
+\begin{itemize}
+\item \textbf{Dialogue / Boundary :} une classe par écran (recherche, saisie, confirmation).
+\item \textbf{Contrôle :} une classe de contrôle par cas d'utilisation ; elle organise les échanges.
+\item \textbf{Entité :} les classes métier utilisées, avec exactement les noms du diagramme de classes du domaine.
+\end{itemize}
+\begin{center}
+\begin{tikzpicture}[node distance=11mm and 14mm]
+\node[actor] (ac) {Adhérent};
+\node[dbox,right=of ac] (v) {«dialogue»\\ÉcranRéservation};
+\node[dbox,right=of v] (co) {«contrôle»\\ContrôleRéserver};
+\node[dbox,right=of co] (en) {«entité»\\Réservation};
+\draw[-,thick] (ac)--(v);\draw[-,thick] (v)--(co);\draw[-,thick] (co)--(en);
+\end{tikzpicture}
+\end{center}
+\textbf{Règle absolue du cours :} pas de lien direct \texttt{ÉcranRéservation -- Réservation}. L'acteur dialogue uniquement avec l'interface. \emph{Le DCP n'est pas encore un diagramme chronologique} : il montre les collaborations et attributs/opérations pertinents.
+\begin{exobox}
+Un projet a trois écrans : recherche, choix, confirmation. Un DCP avec \emph{un seul écran générique} peut être incomplet si les trois maquettes figurent dans l'énoncé. Trois dialogues, un contrôle du cas, entités du domaine ; ne créez pas trois « ContrôleurGlobaux » sans objectif.
+\end{exobox}
+\source{ASI\_C3, DCP ; ASI\_C5, page 13.}
+
+\section{Séquence N3 (MVC) : ouvrir la boîte noire}
+La N3 répond au \emph{même cas} que la N1, mais montre \textbf{vue, contrôle, modèle}. Le modèle possède les règles du métier ; le contrôle coordonne les objets ; la vue affiche et reçoit les actions.
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=.68cm]
+\foreach \x/\t in {0/Client,2.6/Vue,5.2/Contrôle,7.8/Réservation} {
+ \node[dbox,minimum width=22mm] at (\x,0) {\t};\draw[life] (\x,-.43)--(\x,-7);
+}
+\draw[assoc] (0,-1)--node[above,font=\scriptsize]{1: demander()}(2.6,-1);
+\draw[assoc] (2.6,-2)--node[above,font=\scriptsize]{2: soumettre()}(5.2,-2);
+\draw[assoc] (5.2,-3)--node[above,font=\scriptsize]{3: vérifier()}(7.8,-3);
+\draw[<-,dashed] (5.2,-4)--node[above,font=\scriptsize]{4: résultat}(7.8,-4);
+\draw[teal] (4.4,-4.5) rectangle (8.6,-6.15);
+\node[font=\scriptsize,anchor=north west] at (4.5,-4.6) {alt [valide] / [refusé]};
+\draw[<-,dashed] (2.6,-5.5)--node[above,font=\scriptsize]{5: état ou erreur}(5.2,-5.5);
+\draw[<-,dashed] (0,-6.6)--node[above,font=\scriptsize]{6: afficher()}(2.6,-6.6);
+\end{tikzpicture}
+\end{center}
+\begin{warningbox}
+Trois violations MVC à connaître : \textbf{Vue \(\rightarrow\) Entité} sans contrôle ; contrôle qui calcule seul les règles du métier ; entité qui commande l'affichage. La N3 doit reprendre les échanges visibles de la N1 \textbf{et la branche d'erreur}.
+\end{warningbox}
+\textbf{Niveaux :} N1 = système noir ; N2 = objets du domaine visibles (vue d'analyse intermédiaire) ; N3 = classes participantes et conception MVC, selon la progression du cours.
+\source{ASI\_C3, partie MVC et séquences ; ASI\_C5, page 10.}
+
+\section{Diagramme de communication : messages numérotés}
+Même idée de collaboration qu'une séquence N3, mais sans axe du temps vertical. On pose les participants, on trace les liens, on inscrit \textbf{1:, 2:, 3:\ldots} sur les messages, avec flèche de direction. Les appels imbriqués peuvent utiliser \texttt{1.1}, \texttt{1.2}.
+\begin{center}
+\begin{tikzpicture}[node distance=17mm and 28mm]
+\node[dbox] (v) {ÉcranRecherche};\node[dbox,right=of v] (c) {ContrôleRecherche};
+\node[dbox,below=of c] (r) {Classement};
+\draw[-,thick] (v)--node[above,font=\scriptsize]{1: rechercher()}(c);
+\draw[-,thick] (c)--node[right,font=\scriptsize]{2: trouver()}(r);
+\draw[assoc] ($(v.east)+(1mm,-3mm)$)--($(c.west)+(-1mm,-3mm)$);
+\draw[assoc] ($(c.south)+(-3mm,-1mm)$)--($(r.north)+(-3mm,1mm)$);
+\end{tikzpicture}
+\end{center}
+Le TD \emph{Organisation de courses de fond} demande ce modèle pour \emph{rechercher un classement}. C'est une extension utile de la N3 : même cas, mêmes entités et mêmes opérations, \textbf{messages ordonnés}.
+
+\section{Processus unifié, vision, exigences et risques}
+\subsection{Processus unifié en quatre phases}
+\begin{tabularx}{\linewidth}{@{}p{29mm}X@{}}
+\toprule
+Phase & But en une phrase \\
+\midrule
+Inception & Pourquoi le projet ? Périmètre, utilisateurs, vision, risques, coût. \\
+Élaboration & Réduire les risques critiques et définir une architecture qui tient. \\
+Construction & Construire le produit par itérations, tester et intégrer. \\
+Transition & Déployer, former, corriger et faire adopter le système. \\
+\bottomrule
+\end{tabularx}
+La démarche est \textbf{itérative} : le diagramme d'états peut faire corriger les classes ; les classes peuvent faire corriger les cas d'utilisation.
+
+\subsection{Document de vision : quoi remplir ?}
+Le gabarit du cours comprend notamment : \textbf{position du problème}, position du produit, parties prenantes/acteurs, périmètre/hors périmètre, exigences non fonctionnelles mesurables, contraintes/hypothèses, risques principaux, itérations/jalons, maquettes. Il explique \emph{pourquoi} et \emph{pour qui} ; il ne remplace pas les descriptions détaillées des cas.
+
+\begin{exobox}
+\bad{} « L'application doit être rapide et très sécurisée. »\\
+\good{} « 95\% des recherches répondent en moins de 2 s ; les paiements passent par un prestataire certifié ; tout changement de rôle est tracé. » Ce sont des exigences \emph{vérifiables} ; elles influencent le modèle et l'architecture.
+\end{exobox}
+\subsection{Contrainte, hypothèse et risque : ne pas confondre}
+\textbf{Contrainte :} imposée et connue (loi, délai, budget). \textbf{Hypothèse :} supposée vraie mais non confirmée (H1 : un compte ne peut avoir qu'une réservation active par créneau). \textbf{Risque :} événement possible qui peut gêner le projet (indisponibilité de l'API bancaire). Une fiche de risque précise probabilité, gravité, parade, responsable et moment de levée.
+\source{ASI\_C4 et Document de vision.pdf.}
+
+\section{Scrum, MVP, story map, SAFe : théorie à connaître}
+\subsection{Scrum : 3 responsabilités, 5 événements, 3 artefacts}
+\begin{tabularx}{\linewidth}{@{}p{33mm}X@{}}
+\toprule
+Élément & Sens simple \\
+\midrule
+Product Owner & Responsable de la valeur et de l'ordre du Product Backlog. \\
+Scrum Master & Aide à comprendre et appliquer Scrum, enlève les obstacles. \\
+Developers & Créent l'incrément utilisable ; ils s'organisent eux-mêmes. \\
+Sprint & Cycle court contenant les autres événements. \\
+Sprint Planning & Choisir pourquoi, quoi et comment travailler pendant le sprint. \\
+Daily Scrum & 15 minutes pour inspecter l'avancement vers le Sprint Goal. \\
+Sprint Review & Examiner le résultat et adapter la suite avec les parties prenantes. \\
+Sprint Retrospective & Améliorer le fonctionnement de l'équipe. \\
+Product Backlog / Product Goal & Travail à venir ordonné / objectif du produit. \\
+Sprint Backlog / Sprint Goal & Plan du sprint / objectif du sprint. \\
+Increment / Definition of Done & Résultat utilisable / qualité nécessaire pour être terminé. \\
+\bottomrule
+\end{tabularx}
+\textbf{Story map :} ranger les activités du parcours utilisateur puis les découper en tâches / versions. \textbf{MVP :} plus petite version donnant une valeur vérifiable et permettant d'apprendre. Ce n'est pas « la version mal finie ».
+\begin{warningbox}
+Scrum n'est pas un cycle en V décoré d'un Daily Scrum. Un Product Owner sans droit de décider et un backlog figé un an ne suffisent pas à rendre un projet agile. \emph{Affinage du backlog} = activité continue, pas sixième événement officiel.
+\end{warningbox}
+\textbf{SAFe :} un cadre de Lean-Agile à grande échelle, pour aligner stratégie, équipes et livraisons. Distinguer un besoin d'échelle réel d'une organisation qui ajoute seulement des réunions. Le livre SAFe joint est un complément, pas une fiche UML parmi les six de l'examen.
+\source{ASI\_C4 ; SAFe\_Explained\_Ebook\_FR.pdf (complément).}
+
+\section{MVC, architecture et décisions de conception}
+\textbf{MVC :} Modèle = données et règles du métier ; Vue = présentation ; Contrôleur = coordination des actions. En conception on peut avoir d'autres composants techniques, mais ils ne doivent pas polluer le diagramme \emph{du domaine}.\\
+\textbf{C4 (vue architecture) :} contexte d'un système, conteneurs applicatifs, composants et code ; ces niveaux servent à discuter du système à différentes échelles. Ils ne remplacent ni le diagramme de classes ni la séquence N3.\\
+\textbf{Non-fonctionnel et RGPD :} volumétrie, disponibilité, confidentialité, conservation des données, fonctionnement hors ligne ont des conséquences concrètes : archivage, délai, accès, suppression/anonymisation, synchronisation.
+\begin{exobox}
+Une application de location transmet la position des voitures toutes les deux minutes. Le texte impose \emph{uniquement la dernière position en location normale}, et l'historique \emph{seulement} après dépassement de l'heure de restitution ou vol déclaré. Il serait faux de conserver toujours un \texttt{TrajetClient} « pour faire de l'IA ». Le respect du périmètre et de la vie privée modifie le modèle.
+\end{exobox}
+
+\section{IA, qualité des modèles et traçabilité}
+Le cours permet l'usage d'IA \textbf{dans le projet s'il est déclaré} ; l'étudiant est responsable de la qualité du rendu et doit justifier ses choix. Pour l'examen, suivez strictement les consignes de surveillance et les ressources effectivement autorisées ; l'autorisation d'apporter des documents n'est pas une permission générale d'utiliser des outils numériques.
+
+\subsection{Sept liens à vérifier selon la séance 5}
+\begin{enumerate}
+\item Chaque cas décrit a sa N1 ; les alternatives deviennent des fragments.
+\item Chaque maquette sert un cas ; chaque écran devient dialogue dans un DCP.
+\item Chaque classe du domaine sert vraiment à quelque chose.
+\item Chaque état = une valeur de l'énumération d'état, même orthographe.
+\item Chaque entité du DCP garde le nom du domaine.
+\item La N3 conserve les échanges du cas visibles en N1.
+\item Les hypothèses H1, H2\ldots\ sont écrites et liées aux modèles concernés.
+\end{enumerate}
+\begin{warningbox}
+Les erreurs qui coûtent cher : multiplicités absentes, CRUD comme cas d'utilisation, classes techniques dans le domaine, écran relié directement à une entité, cycle d'états sans retour/délai, contrôleur global, flèches \texttt{include/extend} inversées et \textbf{incohérence entre deux diagrammes}.
+\end{warningbox}
+\source{ASI\_C5, pages 5 et 14.}
+
+\section{Trois mini-cas difficiles corrigés}
+\subsection{Cas A : voyage, facture à la demande}
+\textbf{Énoncé :} Une agence propose des transports inclus dans un séjour. Après la réservation, le client peut demander une facture détaillée. Les disponibilités viennent d'une API externe et ne sont pas conservées.\\
+\textbf{Solution raisonnée :} \texttt{Réserver un séjour} est un cas métier. Le transport n'est pas un cas \emph{autonome} si le texte interdit de le réserver seul. La facture détaillée est \texttt{extend} sous condition, flèche vers le cas de base choisi. L'API partenaire est acteur secondaire. Ne créez pas de classe \texttt{Disponibilité} persistante puisqu'elle est interrogée à la demande.
+
+\subsection{Cas B : hôtel, réservation multi-chambres}
+\textbf{Énoncé :} Le client réserve plusieurs chambres, entre deux dates. Une chambre peut être louée à beaucoup de dates, jamais à deux clients sur des périodes qui se chevauchent. Une plateforme transmet ses ventes seulement par lots.\\
+\textbf{Solution raisonnée :} \texttt{Réservation} porte dates/statut et lie client aux chambres. Pour plusieurs chambres par réservation, justifier une association à plusieurs chambres ou une \texttt{LigneRéservation} si des données propres à chaque ligne sont nécessaires. Le non-chevauchement est une \emph{règle temporelle}, pas une simple multiplicité \texttt{0..1}. La synchronisation par lots est une contrainte fonctionnelle/non fonctionnelle à signaler, sans inventer de disponibilité instantanée.
+
+\subsection{Cas C : courses de fond, trois voies d'inscription}
+\textbf{Énoncé :} Sur Internet, inscription progressive ; sur place, tout est contrôlé avant la course ; par courrier, un document peut manquer ; pour triathlon/vélo, c'est le club qui inscrit et la licence suffit.\\
+\textbf{Solution raisonnée :} Une classe \texttt{Inscription} a un statut cohérent entre classes et états ; les variantes du parcours peuvent justifier des \textbf{gardes} selon le mode et la discipline. Le diagramme d'états n'est pas trois lignes de succès ; il a des rejets, des retours vers l'étape attendue et des délais distincts. En séquence N1, utiliser \texttt{alt} pour les voies pertinentes et les exceptions ; en N3 ne jamais laisser le formulaire contrôler seul l'âge ou la validité du certificat.
+\source{Études de cas 1/2/3 ; Organisation de courses de fond.}
+
+\section{Fiches express : juste avant l'épreuve}
+\begin{tabularx}{\linewidth}{@{}p{35mm}X@{}}
+\toprule
+Si l'énoncé dit\ldots & Je vérifie\ldots \\
+\midrule
+« Le client peut\ldots » & Objectif métier / acteur / frontière \\
+« Si\ldots sinon\ldots » & alt ou garde d'état ; pas une ligne oubliée \\
+« Pour chaque\ldots » & loop en séquence / multiplicité adaptée \\
+« Après 15 jours\ldots » & after(durée), garde et statut d'expiration \\
+« Un ou plusieurs\ldots » & 1..* du côté des multiples \\
+« Au plus un\ldots » & 0..1 (ou 1 si obligatoire) \\
+« Au même instant\ldots » & contrainte temporelle / unicité, pas seulement cardinalité \\
+« Le partenaire transmet\ldots » & acteur externe, message N1 \\
+« écran / bouton\ldots » & dialogue DCP / vue N3, pas classe du domaine \\
+« tarif selon\ldots » & règle/calcul, souvent classe Tarif \\
+« en cas de refus\ldots » & exception N1 / N3 / états / postcondition \\
+\bottomrule
+\end{tabularx}
+
+\begin{memo}
+\textbf{Dernier contrôle en 15 minutes :} (1) frontière/acteurs ; (2) \texttt{include} et \texttt{extend} ; (3) cardinalités aux deux bouts ; (4) aucune classe d'interface dans le domaine ; (5) étapes alternatives ; (6) délais et retours en états ; (7) DCP sans lien dialogue--entité ; (8) N1/N3 synchronisés ; (9) règles importantes et hypothèses écrites ; (10) schémas lisibles et légendés.
+\end{memo}
+
+\clearpage\input{td_courses_complet.tex}\clearpage\section*{Sources et portée de cette révision}
+\addcontentsline{toc}{section}{Sources et portée}
+Base du document : \textit{ASI\_C1 Introduction et modèle des cas d'utilisation} ; \textit{ASI\_C2 Classes, paquetages et états} ; \textit{ASI\_C3 De l'analyse à la conception} ; \textit{ASI\_C4 Conduite de projet et agilité} ; \textit{ASI\_C5 Synthèse, IA et projet} ; \textit{Document de vision} ; \textit{Exercices et études de cas (1, 2, 3)} ; \textit{Location de véhicules} ; \textit{Organisation de courses de fond} ; \textit{SAFe Explained FR} (complément).\\
+Les schémas et mini-cas de cette révision sont des \textbf{illustrations originales}, pas des corrigés officiels. Toute hypothèse non fournie par un énoncé est signalée comme telle. Le contenu couvre le noyau de la matière et les thèmes complémentaires visibles dans les ressources fournies ; il ne peut pas garantir mot pour mot le contenu d'un futur sujet.
+\end{document}
