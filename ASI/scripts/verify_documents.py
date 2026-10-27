@@ -8,6 +8,7 @@ root = Path(__file__).resolve().parents[1]
 files = {
     'revision': root/'dist'/'Revision_ASI_Courses_de_fond.pdf',
     'examen': root/'dist'/'Examen_Blanc_ASI_Corrige.pdf',
+    'corrige': root/'dist'/'Corrige_Integral_Courses_de_Fond_9_Questions.pdf',
 }
 checks = {
     'revision': [
@@ -16,6 +17,7 @@ checks = {
         'Organisation de courses de fond', 'DCP', 'Séquence N3',
         'Communication', 'Paquetages',
     ],
+    'corrige': ['Organisation de courses de fond', 'Description textuelle', 'séquence N3', 'Communication', 'classes du domaine', 'Préconditions', 'Postconditions', 'Paquetages'],
     'examen': [
         'Description textuelle', 'Préconditions', 'Postcondition',
         'séquence système N1', 'Corrigé', 'N3',
@@ -26,7 +28,7 @@ for name, p in files.items():
         raise SystemExit(f'ABSENT: {p}')
     info = subprocess.check_output(['pdfinfo', str(p)], text=True)
     n = int(re.search(r'^Pages:\s*(\d+)', info, re.M).group(1))
-    if n < (20 if name == 'revision' else 12):
+    if n < (20 if name == 'revision' else (17 if name == 'corrige' else 12)):
         raise SystemExit(f'PDF suspect ({n} pages): {p}')
     raw = subprocess.check_output(['pdftotext', '-layout', str(p), '-'], text=True)
     norm = ' '.join(raw.split()).lower()

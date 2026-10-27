@@ -1,0 +1,352 @@
+% Corrigé intégral imprimable du dernier TD, avec planches UML explicatives.
+% Les solutions sont proposées et argumentées; elles ne sont pas le corrigé officiel.
+\documentclass[10pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\setsansfont{Carlito}
+\usepackage[french]{babel}
+\usepackage[a4paper,margin=17mm,headheight=17pt,footskip=12mm]{geometry}
+\usepackage{microtype,xcolor,hyperref,booktabs,tabularx,longtable,array,multicol,enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,shapes.geometric,backgrounds}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec,fancyhdr,lastpage}
+\definecolor{navy}{HTML}{153F56}\definecolor{teal}{HTML}{157A86}
+\definecolor{pale}{HTML}{EDF6F7}\definecolor{warm}{HTML}{FFF4E4}\definecolor{bodygray}{HTML}{445866}
+\hypersetup{colorlinks=true,linkcolor=teal,urlcolor=teal,pdftitle={Corrige integral - Organisation de courses de fond}}
+\renewcommand{\arraystretch}{1.20}
+\setlist[itemize]{leftmargin=*,itemsep=1.5pt,topsep=3pt}
+\setlist[enumerate]{leftmargin=*,itemsep=1.5pt,topsep=3pt}
+\tcbset{before skip=7pt,after skip=7pt,colback=pale,colframe=teal!40,arc=2mm,boxrule=.6pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{memo}[1][]{colback=pale,colframe=teal,title={À retenir},fonttitle=\bfseries,#1}
+\newtcolorbox{warningbox}[1][]{colback=warm,colframe=orange!55!black,title={Piège à éviter},fonttitle=\bfseries,#1}
+\newtcolorbox{exobox}[1][]{colback=white,colframe=navy!40,title={Exemple difficile},fonttitle=\bfseries,#1}
+\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection.}{.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{navy}}{\thesubsubsection}{.6em}{}
+\titlespacing*{\section}{0pt}{17pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\footnotesize\color{bodygray} M2 SIA -- Organisation de courses de fond}
+\fancyhead[R]{\footnotesize\color{bodygray} Corrigé commenté}
+\fancyfoot[L]{\footnotesize\color{bodygray} Support d'entraînement, non officiel -- octobre 2026}
+\fancyfoot[R]{\footnotesize\color{bodygray} Page \thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{.35pt}
+\color{navy}\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\newcommand{\source}[1]{\par{\footnotesize\color{bodygray}\textit{Source : #1}}}
+\tikzset{actor/.style={draw=navy,rounded corners=1pt,minimum width=16mm,minimum height=8mm,fill=white,font=\scriptsize,align=center},usecase/.style={draw=teal,ellipse,minimum width=27mm,minimum height=11mm,fill=pale,font=\scriptsize,align=center},cbox/.style={draw=teal,rounded corners=2pt,fill=pale,minimum width=26mm,minimum height=9mm,align=center,font=\scriptsize},dbox/.style={draw=teal,rectangle,fill=pale,minimum width=24mm,minimum height=8mm,align=center,font=\scriptsize},assoc/.style={-Stealth,draw=navy,thick},umlarrow/.style={-Stealth,draw=navy,dashed},life/.style={draw=bodygray,densely dashed},state/.style={draw=teal,rounded corners=4pt,fill=pale,minimum width=28mm,minimum height=11mm,align=center,font=\scriptsize}}
+\begin{document}
+\thispagestyle{empty}
+\vspace*{22mm}
+{\color{teal}\rule{35mm}{3pt}}\\[12mm]
+{\Huge\bfseries Corrigé intégral\par}
+\vspace{4mm}{\LARGE Organisation de courses de fond\par}
+\vspace{4mm}{\large Les 9 questions du TD final + diagrammes détaillés\par}
+\vspace{14mm}
+\begin{tcolorbox}[colback=pale]
+\textbf{But :} disposer d'un modèle de réponse complet, simple à lire et assez difficile pour s'entraîner à l'examen.\\
+\textbf{Contenu :} cas d'utilisation, description textuelle, séquences N1, classes métier et paquetages, états, deux DCP, communication, séquence N3.\\
+\textbf{Méthode :} textes du TD (6 pages) + fiches méthodologiques ASI C1--C5. Hypothèses indiquées quand le TD ne décide pas lui-même.\end{tcolorbox}
+\vfill
+{\small\color{bodygray} Document d'entraînement indépendant. Ne pas confondre avec la copie envoyée à M. Lahmer le 21 octobre 2026, ni avec un corrigé validé par l'enseignant.}
+\newpage
+\tableofcontents
+\newpage
+\section*{Mode d'emploi avant d'ouvrir les diagrammes}
+\addcontentsline{toc}{section}{Mode d'emploi}
+\begin{memo}
+À l'examen, vous avez un long énoncé : soulignez d'abord les acteurs, les événements, les données métier, les délais et les exceptions. Le TD contient trois canaux (internet, guichet, courrier) et une variante de club (triathlon et vélo). \textbf{Ne fusionnez pas les règles de ces quatre scénarios.}
+\end{memo}
+\begin{tabularx}{\linewidth}{@{}p{40mm}X@{}}\toprule
+\textbf{Mot du sujet} & \textbf{Effet sur la modélisation} \\ \midrule
+\textit{« au plus tard »} & Contrainte de date sur le cas et garde sur la transition ; pas nécessairement minuterie UML.\\
+\textit{« si... sinon... »} & Branche alternative \texttt{alt} dans une séquence, garde \texttt{[condition]} dans les états.\\
+\textit{« a déjà participé »} & Réutiliser les données de \texttt{Concurrent}, mais vérifier le certificat à nouveau.\\
+\textit{« club uniquement »} & Acteur Club distinct ; formulaire traité pour chaque membre ; licence à la place du certificat.\\
+\textit{« cinq meilleurs temps »} & Calcul métier du classement de club ; au plus quatre finisseurs signifie disqualification.\\
+\textit{« transpondeur »} & Entité physique liée au dossard, plusieurs passages et restitution obligatoire.\\
+\bottomrule\end{tabularx}
+\textbf{Hypothèses de modélisation :} H1 : un agent enregistre au guichet/courrier ; H2 : la banque et le service SMS sont externes ; H3 : \texttt{Inscription} possède un statut commun ; H4 : une réservation de dossard et une affectation de puce sont gérées par des objets métier, sans inventer un calendrier précis de distribution ; H5 : le système peut enregistrer des résultats de vérification. Tout choix non explicite est annoncé comme hypothèse.
+\newpage
+\input{td_courses_complet.tex}
+\clearpage
+\section{Planches complémentaires : solutions lisibles pour l'examen}
+Les diagrammes suivants \textbf{complètent} ceux des neuf réponses précédentes. Ils sont volontairement plus grands et séparés par scénario. Chaque diagramme indique les messages, les alternatives et les sorties d'erreur, afin de servir de modèle de dessin sur papier.
+
+\subsection{Q1 -- Vue complète des acteurs et fonctionnalités}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm,scale=.87,transform shape]
+\node[actor] (public) at (0,3.8) {Public};
+\node[actor] (conc) at (0,2.3) {Concurrent};
+\node[actor] (club) at (0,.8) {Club};
+\node[actor] (sec) at (0,-1.1) {Secrétariat};
+\node[actor] (sc) at (0,-3.2) {Service courses};
+\node[actor] (bank) at (9.3,2.5) {Banque};
+\node[actor] (chrono) at (9.3,-2.4) {Chronométrage};
+\node[actor] (sms) at (9.3,-3.8) {Service SMS};
+\draw[teal,rounded corners=3pt,thick] (2.1,-5) rectangle (7.9,5.0);
+\node[font=\scriptsize,fill=white] at (5,5){Application de gestion des courses};
+\node[usecase] (info) at (4.8,4.1) {Consulter\\conditions};
+\node[usecase] (form) at (4.8,2.95) {Télécharger\\formulaire};
+\node[usecase] (internet) at (4.8,1.8) {S'inscrire en ligne};
+\node[usecase] (papier) at (4.8,.65) {Enregistrer\\courrier};
+\node[usecase] (guichet) at (4.8,-.5) {Inscrire sur place};
+\node[usecase] (controle) at (4.8,-1.65) {Contrôler\\paiement et pièces};
+\node[usecase] (result) at (4.8,-2.8) {Gérer résultats\\et récompenses};
+\node[usecase] (recherche) at (4.8,-3.95) {Rechercher\\classement};
+\draw[navy] (public)--(info);\draw[navy] (public)--(form);\draw[navy] (public) to[bend right=25] (recherche);
+\draw[navy] (conc)--(internet);\draw[navy] (club)--(internet);\draw[navy] (club)--(papier);
+\draw[navy] (sec)--(papier);\draw[navy] (sec)--(guichet);\draw[navy] (sec)--(controle);
+\draw[navy] (sc)--(result);\draw[navy] (bank)--(internet);\draw[navy] (chrono)--(result);\draw[navy] (sms)--(result);
+\end{tikzpicture}\end{center}
+\textbf{Lecture.} Les acteurs à droite représentent ici des systèmes externes (H2). Ces acteurs échangent avec l'application. Le transpondeur seul n'est pas automatiquement un acteur : c'est le système de chronométrage qui peut jouer ce rôle. Un club ne doit pas être associé à « inscrire sur place ». Pour préciser la variante par club, une seconde vue de cas (voir question 1) évite de surcharger le schéma.
+
+\subsection{Q2 -- Description textuelle : les quatre sorties à ne pas confondre}
+\begin{tabularx}{\linewidth}{@{}p{27mm}X@{}}\toprule
+Sortie & Formulation française à utiliser dans la copie \\ \midrule
+Succès & \textit{« L'inscription devient définitive quand le paiement et le justificatif sont acceptés. »}\\
+Préinscription refusée & \textit{« Si le quota est atteint ou la date J--15 dépassée, aucune préinscription n'est enregistrée. »}\\
+Paiement refusé & \textit{« Le dossier est annulé et le concurrent est informé. »}\\
+Justificatif refusé & \textit{« Le secrétariat refuse la pièce ; le système annule le dossier et avertit le concurrent. »}\\
+\bottomrule\end{tabularx}
+\textbf{Question piège :} « Précondition = il reste des places » ? Les places sont une condition métier contrôlée dans le déroulement ; si elles manquent, le cas doit expliquer le refus. Il est plus précis de réserver les préconditions aux éléments nécessaires avant le déclenchement (accès au site et épreuve visible) puis d'écrire les vérifications dans le scénario.
+\newpage
+\subsection{Q3 -- N1 Internet : décision de préinscription, paiement, pièce}
+\begin{center}\begin{tikzpicture}[x=1cm,y=.61cm]
+\foreach \x/\t in {0/Concurrent,3.3/Système,6.6/Banque,9.8/Secrétariat}{\node[dbox,minimum width=24mm] at (\x,0){\t};\draw[life](\x,-.6)--(\x,-17.2);}
+\draw[assoc](0,-1.3)--node[above,font=\scriptsize]{1: choisirEpreuve()}(3.3,-1.3);
+\draw[densely dashed,-Stealth](3.3,-2.3)--node[above,font=\scriptsize]{2: conditions, tarif, quota}(0,-2.3);
+\draw[assoc](0,-3.4)--node[above,font=\scriptsize]{3: saisirInformations()}(3.3,-3.4);
+\draw[teal](-.5,-3.9)rectangle(10.55,-6.9);
+\node[font=\scriptsize,anchor=west] at(-.3,-4.2){alt [âge, quota et J--15 conformes]};
+\draw[densely dashed,-Stealth](3.3,-5.2)--node[above,font=\tiny]{4a: préinscription créée}(0,-5.2);
+\draw[teal,densely dashed](-.5,-5.6)--(10.55,-5.6);
+\node[font=\scriptsize,anchor=west] at(-.3,-5.9){[non conforme]};
+\draw[densely dashed,-Stealth](3.3,-6.35)--node[above,font=\tiny]{4b: refus motivé}(0,-6.35);
+\draw[assoc](0,-7.7)--node[above,font=\scriptsize]{5: payerParCarte()}(3.3,-7.7);
+\draw[assoc](3.3,-8.8)--node[above,font=\scriptsize]{6: demanderAccord()}(6.6,-8.8);
+\draw[densely dashed,-Stealth](6.6,-9.8)--node[above,font=\scriptsize]{7: accord / refus}(3.3,-9.8);
+\draw[teal](-.5,-10.2)rectangle(10.55,-13.1);
+\node[font=\scriptsize,anchor=west] at(-.3,-10.5){alt [paiement accepté]};
+\draw[densely dashed,-Stealth](3.3,-11.5)--node[above,font=\tiny]{8a: état FINANCIERE}(0,-11.5);
+\draw[teal,densely dashed](-.5,-11.9)--(10.55,-11.9);
+\node[font=\scriptsize,anchor=west] at(-.3,-12.2){[paiement refusé]};
+\draw[densely dashed,-Stealth](3.3,-12.65)--node[above,font=\tiny]{8b: ANNULEE + information}(0,-12.65);
+\draw[assoc](9.8,-14.1)--node[above,font=\scriptsize]{9: enregistrerContrôlePièce()}(3.3,-14.1);
+\draw[teal](-.5,-14.5)rectangle(10.55,-17.0);
+\node[font=\scriptsize,anchor=west] at(-.3,-14.8){alt [certificat conforme]};
+\draw[densely dashed,-Stealth](3.3,-15.65)--node[above,font=\tiny]{10a: DEFINITIVE}(0,-15.65);
+\draw[teal,densely dashed](-.5,-16.05)--(10.55,-16.05);
+\node[font=\scriptsize,anchor=west] at(-.3,-16.35){[certificat refusé]};
+\draw[densely dashed,-Stealth](3.3,-16.75)--node[above,font=\tiny]{10b: ANNULEE + information}(0,-16.75);
+\end{tikzpicture}\end{center}
+\begin{warningbox}
+L'exemple regroupe \textbf{trois \texttt{alt} successifs}. Dans une séquence UML stricte, arrêter le parcours après les branches \texttt{refus} (ou utiliser un \texttt{break}) : une annulation n'est \textbf{jamais} suivie du paiement ou du contrôle d'un certificat. Le courrier du certificat est hors du système web ; seul son contrôle enregistré génère un message système. Pour le paiement par chèque, remplacer l'échange bancaire par celui du secrétariat.
+\end{warningbox}
+\medskip
+\subsection{Q3 -- N1 Sur place : décision et refus sans triathlon/vélo}
+\begin{center}\begin{tikzpicture}[x=1cm,y=.7cm]
+\foreach \x/\t in {0/Concurrent,4.7/Secrétariat,9.4/Système}{\node[dbox,minimum width=27mm] at(\x,0){\t};\draw[life](\x,-.5)--(\x,-12.2);}
+\draw[assoc](0,-1.2)--node[above,font=\scriptsize]{1: remettreDossierEtPaiement()}(4.7,-1.2);
+\draw[assoc](4.7,-2.3)--node[above,font=\scriptsize]{2: saisirDonnéesEtJustificatif()}(9.4,-2.3);
+\draw[densely dashed,-Stealth](9.4,-3.4)--node[above,font=\scriptsize]{3: admissibilité + statut}(4.7,-3.4);
+\draw[teal](3.55,-4.2) rectangle(10.1,-11.7);
+\node[font=\scriptsize,anchor=west] at(3.8,-4.6){alt [places, âge, mode sur place, 1h OK]};
+\draw[assoc](4.7,-5.6)--node[above,font=\tiny]{4a: confirmer Paiement, Certificat()}(9.4,-5.6);
+\draw[densely dashed,-Stealth](9.4,-6.6)--node[above,font=\tiny]{5a: inscription définitive}(4.7,-6.6);
+\draw[assoc](4.7,-7.6)--node[above,font=\tiny]{6a: remettreConfirmation()}(0,-7.6);
+\draw[teal,densely dashed](3.55,-8.4)--(10.1,-8.4);
+\node[font=\scriptsize,anchor=west] at(3.8,-8.8){[quota/âge/heure/mode/paiement/pièce KO]};
+\draw[densely dashed,-Stealth](9.4,-9.8)--node[above,font=\tiny]{4b: refus motivé}(4.7,-9.8);
+\draw[assoc](4.7,-10.9)--node[above,font=\tiny]{5b: informerRefus()}(0,-10.9);
+\end{tikzpicture}\end{center}
+\textbf{Particularité :} les 3 étapes sont réalisées en une seule visite. Le statut final est \texttt{DEFINITIVE} uniquement si tous les contrôles passent. Pas de prise d'inscription sur place pour les triathlons et courses de vélo. La banque intervient pour la carte : détailler sa demande et sa réponse si le paiement carte est choisi. Cette planche reprend la vue principale en noir, sans tous les détails du prestataire externe.
+\medskip
+\subsection{Q3 -- N1 Courrier : un dossier peut attendre une régularisation}
+\begin{center}\begin{tikzpicture}[x=1cm,y=.66cm]
+\foreach \x/\t in {0/Concurrent,4.7/Secrétariat,9.4/Système}{\node[dbox,minimum width=27mm] at(\x,0){\t};\draw[life](\x,-.5)--(\x,-13.4);}
+\draw[assoc](0,-1.3)--node[above,font=\scriptsize]{1: envoyerDossierPapier()}(4.7,-1.3);
+\draw[assoc](4.7,-2.5)--node[above,font=\scriptsize]{2: saisirDossierEtPièces()}(9.4,-2.5);
+\draw[densely dashed,-Stealth](9.4,-3.6)--node[above,font=\scriptsize]{3: retour contrôles}(4.7,-3.6);
+\draw[teal](3.6,-4.2) rectangle(10.1,-12.9);
+\node[font=\scriptsize,anchor=west] at(3.85,-4.55){alt [dossier complet et date <= J--5]};
+\draw[assoc](4.7,-5.6)--node[above,font=\tiny]{4a: confirmerDossier()}(9.4,-5.6);
+\draw[densely dashed,-Stealth](9.4,-6.7)--node[above,font=\tiny]{5a: DEFINITIVE}(4.7,-6.7);
+\draw[teal,densely dashed](3.6,-7.5)--(10.1,-7.5);
+\node[font=\scriptsize,anchor=west] at(3.85,-7.85){[pièce ou paiement non conforme]};
+\draw[densely dashed,-Stealth](9.4,-8.85)--node[above,font=\tiny]{4b: statut conservé}(4.7,-8.85);
+\draw[assoc](4.7,-9.9)--node[above,font=\tiny]{5b: demanderDocument()}(0,-9.9);
+\draw[assoc](0,-11.0)--node[above,font=\tiny]{6b: fournirComplément()}(4.7,-11.0);
+\draw[assoc](4.7,-12.05)--node[above,font=\tiny]{7b: recontrôlerDossier()}(9.4,-12.05);
+\end{tikzpicture}\end{center}
+\textbf{Important :} la branche de complément \emph{réessaie} seulement tant qu'elle respecte J--5. Le texte ne dit pas qu'une simple pièce manquante entraîne l'annulation immédiate. On conserve la phase déjà atteinte et on contacte le concurrent.
+\medskip
+\subsection{Q3 -- N1 Club : ce qui change vraiment}
+\begin{center}\begin{tikzpicture}[x=1cm,y=.72cm]
+\foreach \x/\t in {0/Club,4.7/Système,9.4/Secrétariat}{\node[dbox,minimum width=27mm] at(\x,0){\t};\draw[life](\x,-.5)--(\x,-10.0);}
+\draw[assoc](0,-1.2)--node[above,font=\scriptsize]{1: inscrireMembre(membre, épreuve)}(4.7,-1.2);
+\draw[densely dashed,-Stealth](4.7,-2.3)--node[above,font=\scriptsize]{2: résultat contrôles club et licence}(0,-2.3);
+\draw[teal](-.55,-3.1)rectangle(10.1,-9.6);
+\node[font=\scriptsize,anchor=west] at(-.3,-3.4){alt [club spécialisé, places, J--15, membre licencié]};
+\draw[assoc](0,-4.5)--node[above,font=\tiny]{3a: demanderInscription()}(4.7,-4.5);
+\draw[assoc](9.4,-5.6)--node[above,font=\tiny]{4a: confirmerPaiementEtLicence()}(4.7,-5.6);
+\draw[densely dashed,-Stealth](4.7,-6.7)--node[above,font=\tiny]{5a: DEFINITIVE}(0,-6.7);
+\draw[teal,densely dashed](-.55,-7.4)--(10.1,-7.4);
+\node[font=\scriptsize,anchor=west] at(-.3,-7.75){[club / licence / délai non conformes]};
+\draw[densely dashed,-Stealth](4.7,-8.75)--node[above,font=\tiny]{3b: refus motivé}(0,-8.75);
+\end{tikzpicture}\end{center}
+\textbf{Hypothèse :} le contrôle documentaire se fait par le secrétariat, comme pour les autres épreuves. Le scénario du club \textbf{reprend la validation du paiement}, mais le certificat médical est \textbf{remplacé par la licence} : ne dessinez pas les deux documents comme obligatoires en même temps.
+\newpage
+\subsection{Q4 -- Classes du domaine : tableaux de multiplicité sans ambiguïté}
+\small\begin{longtable}{@{}p{42mm}p{13mm}p{14mm}p{80mm}@{}}\toprule
+Association (A -- B) & vers B & vers A & Lecture / justification \\ \midrule\endhead
+Concurrent -- Inscription & 0..* & 1 & Un concurrent peut faire plusieurs inscriptions ; chaque inscription vise une personne.\\
+Epreuve -- Inscription & 0..* & 1 & Une course reçoit plusieurs dossiers ; un dossier concerne une course.\\
+Inscription -- Paiement & 0..1 & 1 & Modèle simplifié : un seul paiement associé au dossier, ou aucun si en attente. H2.\\
+Inscription -- Justificatif & 0..* & 1 & Plusieurs pièces successives possibles (nouveau certificat) ; chacune appartient à un dossier. H7.\\
+Club -- Concurrent & 0..* & 0..1 & Un membre peut être inscrit pour un club dans ce modèle simplifié ; affiliation à un instant donné. H5.\\
+Epreuve -- Troncon & 1..* & 1 & Un parcours est découpé en tronçons ; chaque tronçon appartient à une épreuve. H8.\\
+Troncon -- Antenne & 1 & 1 & Antenne de fin de tronçon ; simplification pédagogique (la technologie réelle peut réutiliser des équipements). H8.\\
+Transpondeur -- Passage & 0..* & 1 & Une puce déclenche plusieurs temps de passage ; un passage vient d'une puce.\\
+Inscription -- Classement & 0..1 & 1 & Le résultat final du coureur n'existe qu'après la course ; le dossier peut ne pas avoir de classement. H9.\\
+Club -- ClassementClub & 0..* & 1 & Plusieurs participations de club au fil des compétitions ; chaque classement de club vise un club. H9.\\
+\bottomrule\end{longtable}\normalsize
+\textbf{Vérification utile :} les multiplicités se placent \emph{près de l'extrémité} qu'elles quantifient. Les tables ci-dessus utilisent « vers B » pour la quantité de B par instance de A. L'association du club doit pouvoir représenter l'historique si les adhésions changent ; une classe d'association \texttt{Adhesion} serait alors préférable (H5).
+
+\subsection{Q4 -- Contrat de données pour les entités les plus utilisées}
+\small\begin{longtable}{@{}p{29mm}p{63mm}p{61mm}@{}}\toprule
+Entité & Attributs minimum (exemples) & Opérations métier possibles \\ \midrule\endhead
+Concurrent & id, nom, prénom, dateNaissance, sexe, téléphone & verifierAgePour(e), actualiserCoordonnees()\\
+Epreuve & id, type, dateHeureDepart, quota, tarif & placesDisponibles(), accepteInscription(c,date)\\
+Inscription & id, date, dossard, statut, canal & preinscrire(), enregistrerPaiement(), valider(), annuler()\\
+Paiement & montant, mode, date, accepte & controlerValidite(), enregistrerAccord()\\
+Justificatif & type, dateEmission, conforme & estConformePour(e), renouvelerControle()\\
+Club & id, nom, discipline & estSpecialisePour(e), inscrireMembre()\\
+Transpondeur & code, dossardCourant, restitue & attribuer(), marquerRestitue()\\
+Passage & dateHeure, tempsIntermediaire & calculerTempsNet()\\
+Classement & sexe, categorie, position, temps & calculerPosition(), publier()\\
+ClassementClub & totalTop5, rang, disqualifie & calculerCinqMeilleurs(), disqualifierSiMoinsDeCinq()\\
+\bottomrule\end{longtable}\normalsize
+\textit{Précision :} « opérations possibles » signifie conception de responsabilités cohérente avec le texte, pas signatures imposées par l'enseignant. Le domaine ne contient pas \texttt{SQLConnection}, \texttt{RepositoryDAO}, \texttt{VueHTML} ou \texttt{SessionHTTP}.
+\medskip
+\subsection{Q6 -- Etats : événements, gardes, actions, y compris régularisation}
+\begin{center}\begin{tikzpicture}[node distance=12mm and 18mm]
+\node[state] (pre) {Préinscription};
+\node[state,right=of pre] (fin) {Financière};
+\node[state,right=of fin] (def) {Définitive};
+\node[state,below=24mm of fin] (ann) {Annulée};
+\node[circle,fill=navy,inner sep=2pt,left=10mm of pre] (start) {};
+\node[draw,circle,minimum size=6mm,inner sep=0pt,right=13mm of def] (end) {};
+\node[fill=navy,circle,minimum size=2.7mm,inner sep=0pt] at(end.center){};
+\draw[assoc](start)--node[above,font=\tiny]{demande [quota, âge, date OK] / créer()}(pre);
+\draw[assoc](pre)--node[above,font=\tiny]{paiementAccepté [accord obtenu] / noterAccord()}(fin);
+\draw[assoc](fin)--node[above,font=\tiny]{pièceConforme [moins de 1 an OU licence] / confirmer()}(def);
+\draw[assoc](def)--(end);
+\draw[assoc](pre) to[bend right=23] node[below,sloped,font=\tiny]{refusPaiement [canal internet] / annuler()}(ann);
+\draw[assoc](fin)--node[right,font=\tiny]{pièceRefusée [canal internet] / annuler()}(ann);
+\draw[assoc](pre) to[out=130,in=230,looseness=5] node[left,font=\tiny]{pièceReçue [courrier, avant J--5] / contrôler()} (pre);
+\draw[assoc](fin) to[out=35,in=145,looseness=5] node[above,font=\tiny]{pièceReçue [courrier, avant J--5] / vérifier()}(fin);
+\end{tikzpicture}\end{center}
+\textbf{Lecture importante :} le modèle est \emph{une vue abstraite}. Sur place ou avec un dossier postal complet, le logiciel peut traverser les trois états en une seule opération : \texttt{Préinscription} puis \texttt{Financière} puis \texttt{Définitive}. Le délai J--5 est une garde pour le courrier, pas un \texttt{after(5 jours)} si aucune annulation automatique n'est donnée. L'état \texttt{ANNULEE} est terminal dans ce modèle, sauf nouvelle demande distincte.
+\newpage
+\subsection{Q7 -- DCP : deux cas, deux contrôles (schémas détaillés)}
+\begin{center}\begin{tikzpicture}[node distance=9mm and 12mm]
+\node[actor] (a) {Concurrent};\node[cbox,right=of a] (d1) {«dialogue»\\PageSaisie\\saisirDonnees()};
+\node[cbox,below=of d1] (d2) {«dialogue»\\PagePaiement\\choisirMode()};
+\node[cbox,right=18mm of d1] (ctrl) {«contrôle»\\ControleInscription\\demanderInscription()};
+\node[cbox,right=20mm of ctrl,yshift=20mm] (e) {«entité»\\Epreuve};
+\node[cbox,right=20mm of ctrl,yshift=10mm] (c) {«entité»\\Concurrent};
+\node[cbox,right=20mm of ctrl] (i) {«entité»\\Inscription};
+\node[cbox,right=20mm of ctrl,yshift=-10mm] (p) {«entité»\\Paiement};
+\node[cbox,right=20mm of ctrl,yshift=-20mm] (j) {«entité»\\Justificatif};
+\draw[navy](a)--(d1);\draw[navy](a)--(d2);\draw[navy](d1)--(ctrl);\draw[navy](d2)--(ctrl);
+\foreach \target in {e,c,i,p,j}{\draw[navy](ctrl)--(\target);}
+\end{tikzpicture}\end{center}
+\textbf{H6 :} les écrans de saisie et de paiement sont déduits du scénario ; \emph{ils ne sont pas fournis} comme maquettes dans le TD. Une vraie maquette n'existe que pour « Rechercher un classement ».
+\begin{center}\begin{tikzpicture}[node distance=10mm and 16mm]
+\node[actor] (v) {Public};
+\node[cbox,right=of v] (vue) {«dialogue»\\PageRechercheClassement\\saisirCritères()};
+\node[cbox,right=of vue] (ctrl) {«contrôle»\\ControleRecherche\\rechercher()};
+\node[cbox,right=of ctrl,yshift=13mm] (a) {«entité»\\Concurrent};
+\node[cbox,right=of ctrl] (b) {«entité»\\Inscription};
+\node[cbox,right=of ctrl,yshift=-13mm] (c) {«entité»\\Classement};
+\draw[navy](v)--(vue);\draw[navy](vue)--(ctrl);\draw[navy](ctrl)--(a);\draw[navy](ctrl)--(b);\draw[navy](ctrl)--(c);
+\end{tikzpicture}\end{center}
+\textbf{Règle de traçabilité :} mêmes noms d'entités dans le diagramme de classes et le DCP. La vue ne doit pas appeler l'entité directement. Un contrôle est lié à un cas d'utilisation, pas à chaque bouton.
+\medskip
+\subsection{Q8 -- Communication : la chronologie est écrite sur les liens}
+\begin{center}\begin{tikzpicture}[node distance=14mm and 20mm]
+\node[actor] (act) {Visiteur};\node[cbox,right=of act] (vue) {:PageRechercheClassement};
+\node[cbox,right=of vue] (ctrl) {:ControleRecherche};
+\node[cbox,right=of ctrl,yshift=15mm] (c) {:Concurrent};
+\node[cbox,right=of ctrl] (i) {:Inscription};
+\node[cbox,right=of ctrl,yshift=-15mm] (cl) {:Classement};
+\draw[navy](act)--node[above,font=\tiny]{1: saisirCritères()}(vue);
+\draw[navy](vue)--node[above,font=\tiny]{2: rechercher(critères)}node[below,font=\tiny]{6: afficher(résultats)}(ctrl);
+\draw[navy](ctrl)--node[above,sloped,font=\tiny]{3: lireIdentités()}(c);
+\draw[navy](ctrl)--node[above,font=\tiny]{4: lireDossards()}(i);
+\draw[navy](ctrl)--node[below,sloped,font=\tiny]{5: trouverClassement()}(cl);
+\end{tikzpicture}\end{center}
+\textbf{Si aucun classement n'est trouvé :} message conditionnel \texttt{6 [résultat vide] : afficherAucunRésultat()}. Les éléments \texttt{Dossard, Nom, Prénom, Sexe, Catégorie} viennent de la capture de l'énoncé (page 5). Le diagramme de communication numérote les messages \textbf{sur les liens} ; il n'a pas de temps vertical comme la séquence.
+\newpage
+\subsection{Q9 -- Séquence N3 MVC, inscription sur place, partie 1}
+\begin{center}\begin{tikzpicture}[x=1cm,y=.65cm]
+\foreach \x/\t in {0/Secrétariat,3.2/PageGuichet,6.5/ControleInscription,9.8/Epreuve}{\node[dbox,minimum width=25mm] at(\x,0){\t};\draw[life](\x,-.6)--(\x,-12.3);}
+\draw[assoc](0,-1.2)--node[above,font=\scriptsize]{1: saisirDossier()}(3.2,-1.2);
+\draw[assoc](3.2,-2.3)--node[above,font=\scriptsize]{2: inscrireSurPlace()}(6.5,-2.3);
+\draw[assoc](6.5,-3.4)--node[above,font=\scriptsize]{3: estAdmissible()}(9.8,-3.4);
+\draw[densely dashed,-Stealth](9.8,-4.45)--node[above,font=\scriptsize]{4: places, âge, délai, canal}(6.5,-4.45);
+\draw[teal](2.6,-5.1) rectangle(10.4,-11.8);
+\node[font=\scriptsize,anchor=west] at(2.8,-5.45){alt [non admissible]};
+\draw[assoc](6.5,-6.55)--node[above,font=\tiny]{5a: afficherRefus(motif)}(3.2,-6.55);
+\draw[teal,densely dashed](2.6,-7.5)--(10.4,-7.5);
+\node[font=\scriptsize,anchor=west] at(2.8,-7.82){[admissible]};
+\draw[assoc](6.5,-8.95)--node[above,font=\tiny]{5b: ouvrirContrôlePièces()}(3.2,-8.95);
+\draw[densely dashed,-Stealth](3.2,-10.05)--node[above,font=\tiny]{6b: demanderPièces()}(0,-10.05);
+\end{tikzpicture}\end{center}
+\textbf{Attention :} ce schéma traite seulement l'admissibilité. Ensuite, l'entité \texttt{Inscription} peut créer le dossier. La seconde planche montre les contrôles suivants.
+\medskip
+\subsection{Q9 -- Séquence N3 MVC, inscription sur place, partie 2}
+\begin{center}\begin{tikzpicture}[x=.9cm,y=.62cm]
+\foreach \x/\t in {0/Agent,3/Vue,6/Contrôle,9/Paiement,12/Justificatif,15/Inscription}{\node[dbox,minimum width=17mm,font=\tiny] at(\x,0){\t};\draw[life](\x,-.5)--(\x,-14.1);}
+\draw[assoc](0,-1.15)--node[above,font=\tiny]{1: transmettreDonnées()}(3,-1.15);
+\draw[assoc](3,-2.25)--node[above,font=\tiny]{2: enregistrerPièces()}(6,-2.25);
+\draw[assoc](6,-3.35)--node[above,font=\tiny]{3: verifier(mode,montant)}(9,-3.35);
+\draw[densely dashed,-Stealth](9,-4.45)--node[above,font=\tiny]{4: accord / refus}(6,-4.45);
+\draw[assoc](6,-5.55)--node[above,font=\tiny]{5: estConforme()}(12,-5.55);
+\draw[densely dashed,-Stealth](12,-6.65)--node[above,font=\tiny]{6: conforme / refus}(6,-6.65);
+\draw[teal](5.4,-7.2) rectangle(15.65,-13.7);
+\node[font=\scriptsize,anchor=west] at(5.6,-7.55){alt [tous les contrôles sont OK]};
+\draw[assoc](6,-8.65)--node[above,font=\tiny]{7a: validerInscription()}(15,-8.65);
+\draw[densely dashed,-Stealth](15,-9.75)--node[above,font=\tiny]{8a: confirmation + dossard}(6,-9.75);
+\draw[assoc](6,-10.85)--node[above,font=\tiny]{9a: afficherConfirmation()}(3,-10.85);
+\draw[teal,densely dashed](5.4,-11.35)--(15.65,-11.35);
+\node[font=\scriptsize,anchor=west] at(5.6,-11.65){[paiement ou certificat refusé]};
+\draw[assoc](6,-12.8)--node[above,font=\tiny]{7b: afficherRefus()}(3,-12.8);
+\end{tikzpicture}\end{center}
+\textbf{Lecture MVC :} l'agent parle à la vue ; la vue parle au contrôle ; le contrôle appelle des entités métier. L'entité \texttt{Paiement} ne demande pas elle-même un affichage ; \texttt{Justificatif} décide de sa conformité. \textbf{Brancher la banque} lorsque le mode carte l'exige. \textbf{Avant cette partie}, le contrôle a aussi récupéré/actualisé \texttt{Concurrent} et vérifié \texttt{Epreuve} : voir tableau détaillé de la question 9.
+\newpage
+\section{Contrôle qualité avant impression et avant l'examen}
+\begin{tabularx}{\linewidth}{@{}p{19mm}X@{}}\toprule
+Travail & Ce qui doit apparaître dans votre copie \\ \midrule
+Q1 & Acteurs du domaine et systèmes externes, cas cohérents, périmètre, variante club interdite au guichet.\\
+Q2 & Identification, but, déclencheur, préconditions, chemin nominal, alternatives, exceptions, postconditions, délais et règlement.\\
+Q3 & Internet, guichet, courrier, club en variante ; N1 = système en boîte noire ; aucune classe technique.\\
+Q4 & Classes métier, opérations vraies, données, associations et multiplicités justifiées ; chronométrage et récompenses.\\
+Q5 & Paquetages orientés métier, dépendances orientées vers celui qui est utilisé.\\
+Q6 & État initial et final, 4 statuts, déclencheurs \texttt{événement [garde] / action}, reprise courrier.\\
+Q7 & Deux DCP ; acteurs -- dialogues -- contrôles -- entités, aucun lien direct dialogue--entité.\\
+Q8 & Objets identifiés, liens et messages numérotés ; branche de classement non trouvé.\\
+Q9 & Même acteurs et décisions qu'en N1 ; vue, contrôle et entités cohérents avec DCP, paiement et certificat.\\
+\bottomrule\end{tabularx}
+\begin{warningbox}
+Ne confondez pas \textbf{correction détaillée} et \textbf{vérité du sujet}. L'énoncé ne définit pas exactement toutes les classes, cardinalités, écrans internes ni le contenu des notifications. Les parties déduites doivent être écrites comme \textbf{hypothèses} et non présentées comme faits. C'est une compétence demandée dans ASI C5.
+\end{warningbox}
+\section*{Sources}
+\addcontentsline{toc}{section}{Sources}
+\begin{itemize}
+\item \textit{Organisation de courses de fond}, énoncé universitaire, pages 3--6 : règles métier et neuf questions.
+\item ASI C1--C3 : cas d'utilisation, description textuelle, classes, états, DCP, N1 et N3.
+\item ASI C5 : fiches des six diagrammes et contrôle de cohérence.
+\item Copie personnelle envoyée à M. Ali Lahmer, le 21 octobre 2026 : point de comparaison, \textbf{pas} preuve d'une correction officielle.
+\end{itemize}
+\end{document}

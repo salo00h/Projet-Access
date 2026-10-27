@@ -35,3 +35,13 @@ Les classes, leur affectation des règles, certains noms d'écran, les multiplic
 - `make pdf` : XeLaTeX crée les deux PDF dans `dist/`.
 - `make verify` : contrôle PDF, sections obligatoires et contenu du sujet.
 - Chaque push sur `asi-revision-courses-de-fond` déclenche GitHub Actions et régénère les PDF téléchargeables depuis le dépôt. Garder les sources versionnées.
+
+
+## Corrigé intégral autonome (nouveau)
+
+- `sources/corrige_integral.tex` contient les neuf questions et les planches de clarification.
+- La copie de 29 pages envoyée à M. Lahmer le 21 octobre 2026 a été retrouvée dans les courriels et comparée comme document personnel, sans la considérer comme un corrigé officiel.
+- Les échanges physiques courrier et remise des pièces restent distincts des messages envoyés au SI.
+- Après un refus en ligne, le scénario cesse ; une inscription par courrier peut rester ouverte pour régularisation avant J-5.
+- Certaines planches séparent les phases pour lisibilité ; leurs branches de refus sont exclusives et ne déclenchent pas les phases suivantes.
+- Le dossier garde les hypothèses affichées lorsque le cas ne fixe pas les cardinalités, écrans ou opérations internes.

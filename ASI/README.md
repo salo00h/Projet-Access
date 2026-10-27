@@ -4,6 +4,8 @@ Projet de préparation à l'examen, centré sur **Organisation de courses de fon
 
 ## Livrables
 
+- [`dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf`](dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf) : **corrigé complet, indépendant et imprimable des neuf questions du TD final**, avec planches N1 (internet, guichet, courrier, club), classes, états, DCP, communication et N3. Modèle pédagogique **non officiel**.
+
 - [`dist/Revision_ASI_Courses_de_fond.pdf`](dist/Revision_ASI_Courses_de_fond.pdf) : fiche complète en français simple **avec les neuf questions du TD, une **description textuelle détaillée** et les diagrammes**.
 - [`dist/Examen_Blanc_ASI_Corrige.pdf`](dist/Examen_Blanc_ASI_Corrige.pdf) : examen blanc difficile, un seul sujet, cinq questions, une description textuelle détaillée corrigée et schémas UML.
 
@@ -11,11 +13,12 @@ Projet de préparation à l'examen, centré sur **Organisation de courses de fon
 
 Les sources éditables sont :
 
+- [`sources/corrige_integral.tex`](sources/corrige_integral.tex) : source autonome du corrigé intégral (inclut `td_courses_complet.tex`).
 - [`sources/revision.tex`](sources/revision.tex)
 - [`sources/td_courses_complet.tex`](sources/td_courses_complet.tex) : **corrigé des neuf travaux, à modifier en priorité**.
 - [`sources/examen_blanc.tex`](sources/examen_blanc.tex)
 
-Pour produire les PDF localement : `make pdf` (XeLaTeX, latexmk et police Carlito).
+Pour produire **les trois PDF** localement : `make pdf` (XeLaTeX, latexmk et police Carlito).
 
 Sur GitHub, chaque push sur la branche de ce projet déclenche la compilation et place les nouveaux PDF dans `dist/` ; un artefact téléchargeable est également généré. Évitez de modifier directement les PDF : modifiez les fichiers `.tex`.
 
