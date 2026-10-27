@@ -1,0 +1,511 @@
+
+\documentclass[10pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\setsansfont{Carlito}
+\usepackage[french]{babel}
+\usepackage[a4paper,margin=18mm,headheight=17pt,footskip=12mm]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\definecolor{navy}{HTML}{153F56}
+\definecolor{teal}{HTML}{157A86}
+\definecolor{pale}{HTML}{EDF6F7}
+\definecolor{warm}{HTML}{FFF4E4}
+\definecolor{redsoft}{HTML}{FCECEC}
+\definecolor{bodygray}{HTML}{445866}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=teal,urlcolor=teal,pdftitle={Analyse des SI - Révision et examen blanc}}
+\usepackage{booktabs,tabularx,longtable,array,multicol}
+\renewcommand{\arraystretch}{1.25}
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*,itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=4pt}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,shapes.geometric,backgrounds}
+\usepackage[most]{tcolorbox}
+\tcbset{before skip=7pt,after skip=7pt,colback=pale,colframe=teal!40,arc=2mm,boxrule=.6pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{memo}[1][]{colback=pale,colframe=teal,title={À retenir},fonttitle=\bfseries,#1}
+\newtcolorbox{warningbox}[1][]{colback=warm,colframe=orange!55!black,title={Piège à éviter},fonttitle=\bfseries,#1}
+\newtcolorbox{exobox}[1][]{colback=white,colframe=navy!40,title={Exemple difficile},fonttitle=\bfseries,#1}
+\newtcolorbox{answerbox}[1][]{colback=pale,colframe=teal!40,title={Justification / réponse},fonttitle=\bfseries,#1}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection.}{.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{navy}}{\thesubsubsection}{.6em}{}
+\titlespacing*{\section}{0pt}{17pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+\usepackage{fancyhdr,lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{bodygray} M2 SIA -- Analyse des SI d'entreprise}
+\fancyhead[R]{\footnotesize\color{bodygray} Révision UML}
+\fancyfoot[L]{\footnotesize\color{bodygray} Support indépendant basé sur les cours 2026-2027}
+\fancyfoot[R]{\footnotesize\color{bodygray} \thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{.35pt}
+\color{navy}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newcommand{\tagword}[1]{\textcolor{teal}{\textbf{#1}}}
+\newcommand{\good}{\textcolor{teal}{\textbf{OK}}}
+\newcommand{\bad}{\textcolor{red!70!black}{\textbf{ERREUR}}}
+\newcommand{\source}[1]{\par{\footnotesize\color{bodygray}\textit{Repère cours : #1}}}
+\newcommand{\sep}{\smallskip\hrule\smallskip}
+\tikzset{
+ actor/.style={draw=navy,rounded corners=1pt,minimum width=16mm,minimum height=8mm,fill=white,font=\scriptsize,align=center},
+ usecase/.style={draw=teal,ellipse,minimum width=27mm,minimum height=11mm,fill=pale,font=\scriptsize,align=center},
+ cbox/.style={draw=teal,rounded corners=2pt,fill=pale,minimum width=26mm,minimum height=9mm,align=center,font=\scriptsize},
+ dbox/.style={draw=teal,rectangle,fill=pale,minimum width=24mm,minimum height=8mm,align=center,font=\scriptsize},
+ assoc/.style={-Stealth,draw=navy,thick},
+ umlarrow/.style={-Stealth,draw=navy,dashed},
+ life/.style={draw=bodygray,densely dashed},
+ state/.style={draw=teal,rounded corners=4pt,fill=pale,minimum width=28mm,minimum height=11mm,align=center,font=\scriptsize}
+}
+\newcommand{\cover}[3]{
+\thispagestyle{empty}
+\vspace*{27mm}
+{\color{teal}\rule{25mm}{3pt}}\par\vspace{12mm}
+{\huge\bfseries\color{navy} #1\par}
+\vspace{5mm}{\Large\color{teal}#2\par}
+\vspace{13mm}\begin{tcolorbox}[colback=pale,colframe=teal!40,boxrule=.3pt]
+#3
+\end{tcolorbox}
+\vfill
+{\small\color{bodygray} Master 2 -- Systèmes d'information avancés\\
+Analyse des SI d'entreprise -- iaelyon / Université Jean Moulin Lyon 3\\
+Document d'entraînement original, non officiel -- octobre 2026}
+\newpage
+}
+
+\begin{document}
+\cover{Examen blanc difficile + corrigé}{Une seule étude de cas -- 3 heures -- 20 points}{\textbf{Cas original :} CitéStudio, un réseau municipal de studios de création.\\[3pt]
+\textbf{Dans ce PDF :} sujet complet, 5 questions comme dans le récapitulatif du cours, grilles de points, puis corrigé argumenté avec schémas UML, messages, états, multiplicités et hypothèses.\\[3pt]
+\textbf{Niveau :} difficile. Le sujet et le barème sont créés pour s'entraîner ; \emph{ce n'est pas un sujet officiel ni un corrigé du professeur}.}
+\section*{Consignes de l'épreuve d'entraînement}
+\addcontentsline{toc}{section}{Consignes}
+\begin{itemize}
+\item \textbf{Durée conseillée :} 3 heures, dont 15 minutes finales de vérification.
+\item \textbf{Note :} 20 points. Les points par question sont un choix pédagogique \emph{non officiel}.
+\item Tous les diagrammes doivent être \textbf{cohérents entre eux} : mêmes noms métier, mêmes statuts et mêmes règles.
+\item Vous pouvez écrire des hypothèses numérotées H1, H2 si une règle n'est pas donnée. Ne modifiez jamais une règle explicite.
+\item Utilisez la partie \textbf{SUJET} seule pendant les 3 heures, puis seulement la partie \textbf{CORRIGÉ}.
+\end{itemize}
+\begin{tcolorbox}[colback=warm,colframe=orange!55!black]
+\textbf{Travail autonome :} cachez le corrigé. L'examen réel évalue une décision correcte, pas une copie du diagramme du cours. Certaines variantes de modèle sont acceptables si les règles sont respectées et les choix justifiés.
+\end{tcolorbox}
+\newpage
+\begin{center}{\Large\bfseries\color{teal} PARTIE I -- SUJET}\end{center}
+\section{Contexte de l'entreprise CitéStudio}
+La ville exploite un réseau de \textbf{trois sites} ouverts aux associations et aux habitants. Chaque site possède au moins \textbf{deux studios} : studios de musique, vidéo ou photographie. Certains studios proposent du matériel complémentaire : micros, caméras, éclairages et tables de mixage. Les studios et les équipements peuvent être indisponibles pour entretien.
+
+La ville remplace trois fichiers Excel et un outil ancien par \textbf{un système unique}. Les membres réservent sur un site web ou une application mobile. Les gestionnaires de site traitent les demandes. Les techniciens déclarent les interventions et rendent à nouveau les studios ou les équipements disponibles après réparation. Un prestataire de paiement et un service d'envoi de courriels sont exploités \textbf{par des entreprises extérieures}.
+
+\subsection{Comptes et recherche}
+Un visiteur peut consulter les sites, les studios, les horaires, les tarifs et les équipements proposés. Pour demander une réservation, il doit devenir \textbf{membre} : il fournit nom, prénom, courriel et téléphone ; son adhésion doit avoir le statut \texttt{ACTIVE}. Un membre dont l'adhésion est suspendue peut consulter les offres mais ne peut pas réserver.
+
+Le membre indique un site, une date, une heure de début, une durée de \textbf{1 à 4 heures}, puis le type de studio. Le système affiche les studios encore libres. \textbf{Deux réservations confirmées ou en cours ne peuvent pas occuper le même studio sur des intervalles qui se chevauchent}. Les demandes déjà en attente retiennent provisoirement le créneau ; elles empêchent aussi une autre demande sur les mêmes dates. Un studio en maintenance n'apparaît pas disponible.
+
+\subsection{Équipements, prix et demande en ligne}
+Le membre choisit un studio et peut sélectionner \textbf{zéro à trois équipements physiques}, qui doivent tous appartenir au même site. Un équipement ne peut pas être réservé deux fois sur des créneaux qui se chevauchent ; il est ignoré s'il est en maintenance. Le prix total est calculé ainsi : \textbf{nombre d'heures multiplié par le tarif horaire du studio, plus le forfait de chacun des équipements retenus}. Le montant du studio et celui des équipements sont visibles séparément dans le récapitulatif.
+
+Le membre confirme le récapitulatif. Le système demande au prestataire de paiement une \textbf{autorisation du montant total}, sans débit immédiat. Si l'autorisation est refusée, \textbf{aucune demande de réservation n'est enregistrée} ; le système affiche un message d'erreur. Si elle est acceptée, le système enregistre la demande avec le statut \texttt{EN\_ATTENTE} et le membre reçoit une confirmation de réception par courriel.
+
+\subsection{Décision du gestionnaire : 12 heures}
+Le gestionnaire du site concerné doit \textbf{valider ou refuser} la demande dans les \textbf{12 heures} qui suivent son enregistrement. Avant validation, le système vérifie une dernière fois la disponibilité du studio et des équipements. Si le gestionnaire valide et que tout est encore disponible, le système \textbf{débite le montant précédemment autorisé}, passe la demande à \texttt{CONFIRMEE}, crée une facture initiale et envoie un courriel de confirmation au membre.
+
+Si le gestionnaire refuse ou si la nouvelle vérification échoue, le système passe la demande à \texttt{REFUSEE}, lève l'autorisation et informe le membre par courriel. Si le gestionnaire ne décide rien au bout de 12 heures, le système passe automatiquement la demande à \texttt{EXPIREE}, lève l'autorisation et envoie un courriel.
+
+\subsection{Annulation, séance et restitution}
+Un membre peut annuler une réservation \texttt{CONFIRMEE} \textbf{plus de 24 heures avant} son heure de début. Le système passe la réservation à \texttt{ANNULEE}, rembourse intégralement et informe le membre. Une annulation à 24 heures ou moins du début est refusée et ne change pas le statut.
+
+Le jour prévu, un agent de site enregistre l'arrivée du membre ; la réservation passe à \texttt{EN\_COURS}. À la fin, l'agent contrôle l'état du studio et des équipements. Si tout est conforme, la réservation passe à \texttt{TERMINEE}. Si un dommage est constaté, l'agent l'enregistre et le système crée une \textbf{facture complémentaire} composée d'une ou plusieurs lignes (une ligne par dommage). La réservation passe quand même à \texttt{TERMINEE}. Les techniciens peuvent ensuite enregistrer une intervention de maintenance sur le studio ou sur l'équipement concerné.
+
+\subsection{Règles techniques et limites du système}
+Le système doit répondre à \textbf{95\% des recherches en moins de 2 secondes}. Les autorisations, débits et remboursements sont réalisés par le prestataire externe, jamais par la base interne du système. Les journaux de passage des membres ne sont conservés que 30 jours ; l'historique des factures est conservé selon les obligations comptables. La direction souhaite réutiliser toutes les données de présence pour de futures recommandations, mais cette possibilité \textbf{ne fait pas partie du périmètre demandé}.
+
+\subsection{Trois écrans fournis (description textuelle)}
+\begin{tabularx}{\linewidth}{@{}p{35mm}X@{}}
+\toprule
+Maquette & Éléments visibles \\
+\midrule
+\textbf{Recherche} & Site, date, heure, durée, type de studio ; bouton « Rechercher ». \\
+\textbf{Récapitulatif} & Studio choisi, horaires, liste d'équipements, prix détaillé ; bouton « Confirmer et autoriser ». \\
+\textbf{Confirmation} & Référence, statut \texttt{EN\_ATTENTE} ou message d'échec et action « Revenir ». \\
+\bottomrule
+\end{tabularx}
+\newpage
+\section{Questions -- 20 points}
+\subsection*{Question 1 -- 4 points : besoins et séquence N1}
+\begin{enumerate}[label=\alph*)]
+\item Construisez le \textbf{diagramme de cas d'utilisation} avec les acteurs importants et un découpage fonctionnel en paquetages. Justifiez au moins une relation \texttt{extend} ou \texttt{include} si vous en utilisez. (1,5 pt)
+\item Construisez le \textbf{diagramme de séquence système N1} de « Réserver un studio en ligne », depuis la recherche jusqu'à la décision du gestionnaire. Montrez : absence de places, adhésion suspendue, autorisation refusée, validation, refus, expiration après 12 h ; distinguez clairement autorisation et débit. (2,5 pts)
+\end{enumerate}
+\subsection*{Question 2 -- 6 points : classes du domaine et paquetages}
+Proposez le diagramme de classes \textbf{du domaine}, avec classes, attributs, opérations utiles et multiplicités \emph{aux deux bouts}. Représentez les équipements réservés et les lignes de factures. Ajoutez un découpage en paquetages sans cycle. Expliquez ce que vous laissez hors du domaine. (6 pts)
+\subsection*{Question 3 -- 3 points : états}
+Construisez le \textbf{diagramme d'états d'une demande de réservation} depuis son enregistrement jusqu'à la fin de la séance. Il doit contenir tous les statuts cités, les décisions, le \texttt{after(12 h)}, la limite d'annulation de 24 h, les branches d'erreur et la notation \texttt{événement [condition] / action}. Donnez l'attribut et son énumération dans la classe métier. (3 pts)
+\subsection*{Question 4 -- 3 points : DCP}
+Faites le \textbf{DCP de « Réserver un studio en ligne »}. Utilisez les trois maquettes, une classe de contrôle liée au cas, les entités du domaine \emph{sans les renommer}. Justifiez les liens et l'absence de connexion directe dialogue--entité. (3 pts)
+\subsection*{Question 5 -- 4 points : N3 (MVC)}
+Faites la \textbf{séquence N3 (MVC)} de « Réserver un studio en ligne ». Conservez les échanges externes importants de la N1. Montrez les contrôles métier dans les entités, les appels au prestataire de paiement, l'échec d'autorisation, puis la validation/refus/expiration. Le système ne doit pas avoir une « classe qui fait tout ». (4 pts)
+\begin{warningbox}
+\textbf{Conseil :} dessinez la N1 et la N3 du même cas, avec une logique identique. N'ajoutez pas de classe technique au diagramme \emph{du domaine}. Vérifiez que tous les états de la question 3 existent mot pour mot dans l'énumération de la question 2.
+\end{warningbox}
+\vfill
+\begin{center}\textbf{FIN DE LA PARTIE SUJET -- NE TOURNEZ PAS AVANT D'AVOIR TERMINÉ}\end{center}
+\clearpage
+\begin{center}{\Large\bfseries\color{teal} PARTIE II -- CORRIGÉ EXPLIQUÉ}\end{center}
+\section{Méthode de correction et hypothèses}
+Il existe plusieurs solutions correctes. Voici un \textbf{modèle de référence possible}. Les règles explicitement écrites doivent être respectées, même si vous choisissez d'autres noms ou regroupements. \textbf{N'inventez pas d'« automatisation intelligente » ou d'acteur interne à partir d'un outil technique.}
+
+\begin{answerbox}
+\textbf{H1 :} nous distinguons \texttt{Membre} comme acteur du portail et \texttt{GestionnaireSite}, \texttt{AgentSite}, \texttt{Technicien} comme rôles du personnel. Le visiteur peut consulter l'offre, mais pas réserver sans adhésion active.\\
+\textbf{H2 :} après \texttt{autorisationOK}, la demande est créée immédiatement avec le statut \texttt{EN\_ATTENTE}. Une autorisation refusée ne crée pas de demande.\\
+\textbf{H3 :} l'acte de clôture d'une séance terminée rend l'état final \texttt{TERMINEE} ; une facture de dommage est traitée avant la clôture.\\
+\textbf{H4 :} une facture initiale naît après le débit accepté ; en cas d'incident lors du débit malgré l'autorisation, la demande \emph{ne passe pas} à \texttt{CONFIRMEE} et le gestionnaire traite l'échec. Ce chemin exceptionnel supplémentaire n'a pas été spécifié en détail dans l'énoncé.
+\end{answerbox}
+
+\section{Corrigé Q1 : acteurs, cas et N1}
+\subsection{Acteurs et cas d'utilisation}
+\textbf{Acteurs humains :} Visiteur (consulter), Membre (réserver/annuler), GestionnaireSite (valider/refuser), AgentSite (arrivée/clôture), Technicien (maintenance). \textbf{Acteurs secondaires externes :} PrestatairePaiement, ServiceCourriel. Le studio et la base interne \emph{ne sont pas} des acteurs.
+
+\begin{center}
+\begin{tikzpicture}[scale=.80,transform shape]
+\node[actor] (vis) at (0,2.5) {Visiteur};
+\node[actor] (mem) at (0,.5) {Membre};
+\node[actor] (ges) at (0,-3.5) {Gestionnaire\\Site};
+\node[actor] (agent) at (0,-5.5) {AgentSite};
+\node[actor] (tech) at (0,-7.5) {Technicien};
+\node[usecase] (re) at (4.6,2) {Consulter l'offre};
+\node[usecase] (book) at (4.6,.5) {Réserver\\un studio};
+\node[usecase] (cancel) at (4.6,-1.5) {Annuler\\une réservation};
+\node[usecase] (dec) at (4.6,-3.5) {Traiter une\\demande};
+\node[usecase] (fin) at (4.6,-5.5) {Clôturer\\une séance};
+\node[usecase] (maint) at (4.6,-7.5) {Suivre la\\maintenance};
+\node[usecase] (damage) at (8.5,-5.5) {Facturer\\des dommages};
+\node[actor] (pay) at (9,.5) {Prestataire\\paiement};
+\node[actor] (mail) at (9,-3) {Service\\courriel};
+\draw[-,thick] (vis)--(re);\draw[-,thick](mem)--(re);\draw[-,thick](mem)--(book);\draw[-,thick](mem)--(cancel);
+\draw[-,thick](ges)--(dec);\draw[-,thick](agent)--(fin);\draw[-,thick](tech)--(maint);
+\draw[-,thick](book)--(pay);\draw[-,thick](cancel)--(pay);\draw[-,thick](book)--(mail);\draw[-,thick](dec)--(mail);
+\draw[umlarrow](damage)--node[above,font=\scriptsize]{\guillemotleft extend\guillemotright}(fin);
+\node[draw=teal,dashed,fit=(re)(book)(cancel),inner sep=5mm,label={[font=\scriptsize]above:Portail et réservation}] {};
+\node[draw=teal,dashed,fit=(dec),inner sep=5mm,label={[font=\scriptsize]above:Décisions}] {};
+\node[draw=teal,dashed,fit=(fin)(damage),inner sep=5mm,label={[font=\scriptsize]above:Séances et facturation}] {};
+\node[draw=teal,dashed,fit=(maint),inner sep=5mm,label={[font=\scriptsize]below:Maintenance}] {};
+\end{tikzpicture}
+\end{center}
+\textbf{Pourquoi \texttt{extend} ?} \texttt{Facturer des dommages} se produit seulement si l'agent constate un dommage à la clôture. La flèche va de l'extension vers \texttt{Clôturer une séance}. L'association de paiement et de courriel représente les services externes ; elle ne transforme pas un prestataire en cas d'utilisation.
+\begin{warningbox}
+Il serait faux de dessiner « Saisir heure », « Cliquer confirmer », « Débiter carte », « Enregistrer ligne de table » comme quatre objectifs principaux du membre. Ce sont des étapes ou des responsabilités internes.
+\end{warningbox}
+
+\subsection{Séquence N1 de la réservation}
+Le schéma ci-dessous est une \textbf{version compacte}. Les messages numérotés et les branches qui suivent en font partie ; la N1 représente le système par \emph{une seule} ligne de vie.
+\begin{center}
+\begin{tikzpicture}[x=.85cm,y=.57cm,scale=.9,transform shape]
+\foreach \x/\t in {0/Membre,3.1/Système,7/Prestataire,10/Gestionnaire} {
+ \node[dbox,minimum width=20mm] at (\x,0) {\t}; \draw[life] (\x,-.5)--(\x,-16);
+}
+\draw[assoc] (0,-1)--node[above,font=\scriptsize]{1: rechercher(créneau)}(3.1,-1);
+\draw[<-,dashed] (0,-2)--node[above,font=\scriptsize]{2: disponibilités}(3.1,-2);
+\draw[teal] (-.5,-2.55) rectangle (4.4,-4.2);
+\node[font=\scriptsize,anchor=north west] at (-.4,-2.55){break [aucun studio OU adhésion suspendue]};
+\draw[<-,dashed] (0,-3.5)--node[above,font=\scriptsize]{3a: motif de refus}(3.1,-3.5);
+\draw[assoc] (0,-5)--node[above,font=\scriptsize]{3b: choisir + confirmer}(3.1,-5);
+\draw[assoc] (3.1,-6)--node[above,font=\scriptsize]{4: autoriser(montant)}(7,-6);
+\draw[<-,dashed] (3.1,-7)--node[above,font=\scriptsize]{5: réponse}(7,-7);
+\draw[teal] (-.5,-7.4) rectangle (8.6,-9.55);
+\node[font=\scriptsize,anchor=north west] at (-.4,-7.45){alt [autorisation refusée]};
+\draw[teal,densely dashed] (-.5,-8.57)--(8.6,-8.57);
+\node[font=\scriptsize,anchor=north west] at (-.4,-8.61){[autorisation OK]};
+\draw[<-,dashed] (0,-8.15)--node[above,font=\scriptsize]{6a: erreur ; rien enregistré}(3.1,-8.15);
+\draw[<-,dashed] (0,-9)--node[above,font=\scriptsize]{6b: demande EN\_ATTENTE}(3.1,-9);
+\draw[assoc] (10,-10.3)--node[above,font=\scriptsize]{7: décider}(3.1,-10.3);
+\draw[teal] (2.6,-10.7) rectangle (11.2,-14.28);
+\node[font=\scriptsize,anchor=north west] at (2.7,-10.72){alt [validation et disponibilité OK]};
+\draw[assoc] (3.1,-11.8)--node[above,font=\scriptsize]{8a: débiter autorisation}(7,-11.8);
+\draw[teal,densely dashed] (2.6,-12.07)--(11.2,-12.07);
+\node[font=\scriptsize,anchor=north west] at (2.7,-12.12){[refus ou conflit]};
+\draw[assoc] (3.1,-12.73)--node[above,font=\scriptsize]{8b: lever autorisation}(7,-12.73);
+\draw[teal,densely dashed] (2.6,-13.0)--(11.2,-13.0);
+\node[font=\scriptsize,anchor=north west] at (2.7,-13.06){[after(12 h) sans décision]};
+\draw[assoc] (3.1,-13.76)--node[above,font=\scriptsize]{8c: lever autorisation}(7,-13.76);
+\draw[<-,dashed] (0,-14.8)--node[above,font=\scriptsize]{9: confirmation/refus/expiration}(3.1,-14.8);
+\end{tikzpicture}
+\end{center}
+\textbf{Important :} le service courriel externe peut figurer avec sa propre ligne de vie ; pour garder la figure lisible, le message au service est décrit ici explicitement : \emph{après 6b}, l'accusé de réception est envoyé ; \emph{après 9}, un courriel du résultat est envoyé. Ce sont des messages sortants du système vers un acteur secondaire.
+
+\subsection{Table des branches et messages : version à vérifier}
+\begin{longtable}{@{}p{22mm}p{42mm}p{86mm}@{}}
+\toprule
+Moment & Condition & Comportement attendu \\
+\midrule\endhead
+Recherche & [aucun créneau libre] & Retour « aucun studio disponible » ; aucune demande. \\
+Choix & [adhésion != ACTIVE] & Refus de réserver ; aucune autorisation. \\
+Équipement & [maintenance / conflit] & Ne pas proposer l'équipement ; rechoisir avant confirmation. \\
+Paiement & [autorisation refusée] & Retour d'échec ; \textbf{aucune réservation créée}. \\
+Paiement & [autorisation OK] & Création \texttt{EN\_ATTENTE}, créneau retenu, accusé courriel. \\
+Décision & [validation \& disponibilité OK] & Débit, statut \texttt{CONFIRMEE}, facture initiale, courriel. \\
+Décision & [refus / conflit au recontrôle] & \texttt{REFUSEE}, lever autorisation, avertir. \\
+Délai & [12 h sans décision] & \texttt{EXPIREE}, lever autorisation, avertir. \\
+\bottomrule
+\end{longtable}
+\begin{answerbox}
+\textbf{Ce qui rapporte les points Q1 :} frontière correcte, acteurs externes (pas la base), objectifs métier cohérents, \texttt{extend} justifié, N1 avec une seule ligne \texttt{:Système}, scénarios d'erreur, captures et levées d'autorisation, délais.
+\end{answerbox}
+
+\section{Corrigé Q2 : modèle des classes du domaine}
+\subsection{Classes retenues et responsabilités}
+\begin{longtable}{@{}p{43mm}p{51mm}p{60mm}@{}}
+\toprule
+Classe & Attributs principaux & Opération métier pertinente \\
+\midrule\endhead
+\texttt{Membre} & id, nom, email, statutAdhesion & \texttt{estActif()} \\
+\texttt{Site} & id, adresse, nom & \texttt{listerStudios()} \\
+\texttt{Studio} & id, type, tarifHoraire, enMaintenance & \texttt{estDisponible(debut,fin)} \\
+\texttt{Equipement} & id, type, tarifForfait, enMaintenance & \texttt{estDisponible(debut,fin)} \\
+\texttt{DemandeReservation} & id, debut, fin, montantTotal, statut & \texttt{calculerMontant()}, \texttt{valider()} \\
+\texttt{SelectionEquipement} & id, dateSelection & \texttt{verifierConflit()} ; rattache un équipement à une demande \\
+\texttt{Paiement} & id, referenceExterne, montant, statutPaiement & \texttt{marquerAutorise()}, \texttt{marquerDebite()} \\
+\texttt{Facture} & numero, dateEmission, typeFacture & \texttt{calculerTotal()} \\
+\texttt{LigneFacture} & libelle, montant & \texttt{estValide()} \\
+\texttt{InterventionMaintenance} & id, dateDebut, dateFin, nature & \texttt{cloturer()} \\
+\bottomrule
+\end{longtable}
+\textbf{En plus :} une \texttt{Enumeration StatutReservation} et une \texttt{Enumeration StatutPaiement}. La relation « intervention sur un studio OU un équipement » peut être modélisée par une généralisation \texttt{RessourceMaintenable} (si elle sert réellement les deux types), ou par deux associations exclusives avec une contrainte \texttt{\{exactement une cible\}}. Ce corrigé choisit la seconde solution pour éviter une généralisation purement technique.
+
+\subsection{Diagramme -- cœur de réservation}
+\begin{center}
+\begin{tikzpicture}[scale=.92,transform shape]
+\node[dbox,text width=25mm] (m) at (0,2) {\textbf{Membre}\\id, statutAdhesion\\estActif()};
+\node[dbox,text width=36mm] (r) at (5,2) {\textbf{DemandeReservation}\\debut, fin, statut\\calculerMontant()};
+\node[dbox,text width=25mm] (s) at (5,-.7) {\textbf{Studio}\\tarifHoraire\\estDisponible()};
+\node[dbox,text width=22mm] (site) at (0,-.7) {\textbf{Site}\\nom, adresse};
+\node[dbox,text width=31mm] (sel) at (5,-3.7) {\textbf{SelectionEquipement}\\dateSelection};
+\node[dbox,text width=26mm] (eq) at (0,-3.7) {\textbf{Equipement}\\tarifForfait\\estDisponible()};
+\draw[-,thick](m)--node[above,pos=.09,font=\scriptsize]{1}node[above,pos=.91,font=\scriptsize]{0..*}(r);
+\draw[-,thick](site)--node[above,pos=.09,font=\scriptsize]{1}node[above,pos=.9,font=\scriptsize]{2..*}(s);
+\draw[-,thick](r)--node[right,pos=.12,font=\scriptsize]{0..*}node[right,pos=.89,font=\scriptsize]{1}(s);
+\draw[-,thick](r) to[bend left=30] node[right,pos=.18,font=\scriptsize]{1}node[right,pos=.84,font=\scriptsize]{0..3}(sel);
+\draw[-,thick](sel)--node[above,pos=.13,font=\scriptsize]{0..*}node[above,pos=.9,font=\scriptsize]{1}(eq);
+\draw[-,thick](site)--node[left,pos=.18,font=\scriptsize]{1}node[left,pos=.86,font=\scriptsize]{0..*}(eq);
+\end{tikzpicture}
+\end{center}
+\textbf{Lecture :} chaque demande concerne \emph{un seul} membre et \emph{un studio}, un studio peut être demandé plusieurs fois sur des créneaux différents, chaque sélection porte sur \emph{un équipement}, avec \textbf{au plus 3 sélections par demande}. L'absence de chevauchement est une \emph{contrainte temporelle} et non une cardinalité \texttt{0..1} entre Studio et Demande.
+
+\subsection{Diagramme -- paiement et facturation}
+\begin{center}
+\begin{tikzpicture}[scale=.9,transform shape]
+\node[dbox] (r) at (0,1.7) {DemandeReservation};
+\node[dbox] (p) at (5,1.7) {Paiement};
+\node[dbox] (f) at (0,-1.2) {Facture};
+\node[dbox] (l) at (5,-1.2) {LigneFacture};
+\draw[-,thick](r)--node[above,pos=.12,font=\scriptsize]{1}node[above,pos=.89,font=\scriptsize]{0..1}(p);
+\draw[-,thick](r)--node[left,pos=.12,font=\scriptsize]{1}node[left,pos=.88,font=\scriptsize]{0..*}(f);
+\draw[-,thick](f)--node[above,pos=.12,font=\scriptsize]{1}node[above,pos=.89,font=\scriptsize]{1..*}(l);
+\node[diamond,draw=navy,fill=navy,inner sep=2pt,rotate=90] at ($(f.east)+(2mm,0)$) {};
+\node[font=\scriptsize,align=left,anchor=west] at (5,-2.2) {Composition : les lignes\\appartiennent à leur facture.};
+\end{tikzpicture}
+\end{center}
+\textbf{Hypothèse :} une demande a au plus un paiement principal dans le périmètre donné ; un système prenant plusieurs échéances devrait changer cette multiplicité. Une facture de dommages et une facture initiale justifient \texttt{0..* Facture} par demande.
+
+\subsection{Énumérations et règles métier}
+\begin{tcolorbox}
+\textbf{StatutReservation =} \texttt{EN\_ATTENTE, CONFIRMEE, REFUSEE, EXPIREE, ANNULEE, EN\_COURS, TERMINEE}.\\
+\textbf{StatutPaiement =} \texttt{AUTORISE, DEBITE, LEVE, REMBOURSE}.\\
+\textbf{R1 :} durée autorisée de 1 à 4 heures. \textbf{R2 :} 0 à 3 équipements du même site. \textbf{R3 :} aucun chevauchement sur studio/équipement, en tenant compte des demandes \texttt{EN\_ATTENTE}. \textbf{R4 :} entretien exclut la disponibilité. \textbf{R5 :} autorisation \(\neq\) débit. \textbf{R6 :} annulation possible \emph{strictement plus de 24 h} avant début. \textbf{R7 :} facture complémentaire = une ligne par dommage.
+\end{tcolorbox}
+\subsection{Paquetages sans cycle}
+\begin{center}
+\begin{tikzpicture}[node distance=13mm and 20mm]
+\node[dbox] (refs) {SitesEtRessources};
+\node[dbox,right=of refs] (r) {Reservations};
+\node[dbox,right=of r] (f) {Facturation};
+\node[dbox,below=of refs] (m) {Membres};
+\node[dbox,below=of r] (ent) {Maintenance};
+\draw[umlarrow] (r)--(refs);\draw[umlarrow] (r)--(m);\draw[umlarrow] (f)--(r);\draw[umlarrow] (ent)--(refs);
+\end{tikzpicture}
+\end{center}
+Les dépendances vont du paquetage utilisateur vers celui dont il reprend les concepts. Les services externes de paiement et de courriel restent des \textbf{acteurs d'intégration}, pas des classes du domaine.
+\subsection{Ce qui doit rester hors du modèle du domaine}
+\begin{itemize}
+\item \texttt{EcranRecherche, EcranRecapitulatif, EcranConfirmation} : dialogues du DCP.
+\item \texttt{ControleReservation, DAO, API, BaseSQL} : conception/technique, pas métier.
+\item \texttt{DisponibiliteStockee} : calcul métier sur calendrier, maintenance et retenues ; éviter deux sources de vérité.
+\item \texttt{HistoriqueCompletPresences}, \texttt{ProfilRecommandation} : hors périmètre demandé et question de conservation des données personnelles.
+\item \texttt{ServiceCourrielExterne} : acteur secondaire du système dans les cas/N1 ; ne créer une classe \texttt{Notification} que si le domaine exige un historique propre des envois.
+\end{itemize}
+\begin{answerbox}
+\textbf{Barème pédagogique Q2 :} bons concepts et opérations (2 pts), multiplicités et contraintes (2 pts), facture/sélection (1 pt), paquetages sans cycle et exclusions argumentées (1 pt).
+\end{answerbox}
+
+\section{Corrigé Q3 : diagramme d'états complet}
+\subsection{Les transitions à écrire mot pour mot}
+\begin{longtable}{@{}p{29mm}p{74mm}p{34mm}@{}}
+\toprule
+Origine & Événement [garde] / action & Destination \\
+\midrule\endhead
+Initial & \texttt{autorisationOK / enregistrer()} & EN\_ATTENTE \\
+EN\_ATTENTE & \texttt{valider [disponible] / debiter(); facturer()} & CONFIRMEE \\
+EN\_ATTENTE & \texttt{refuser / leverAutorisation(); notifier()} & REFUSEE \\
+EN\_ATTENTE & \texttt{valider [conflit] / leverAutorisation(); notifier()} & REFUSEE \\
+EN\_ATTENTE & \texttt{after(12 h) [sans décision] / leverAutorisation()} & EXPIREE \\
+CONFIRMEE & \texttt{annuler [début - maintenant > 24 h] / rembourser()} & ANNULEE \\
+CONFIRMEE & \texttt{annuler [début - maintenant <= 24 h] / afficherRefus()} & CONFIRMEE (reste) \\
+CONFIRMEE & \texttt{arriveeEnregistree / ouvrirSeance()} & EN\_COURS \\
+EN\_COURS & \texttt{cloturer [conforme] / enregistrerConstat()} & TERMINEE \\
+EN\_COURS & \texttt{cloturer [dommages] / facturerDommages()} & TERMINEE \\
+\bottomrule
+\end{longtable}
+\begin{warningbox}
+Le refus d'autorisation \textbf{n'entre pas} dans le diagramme d'états \emph{de la demande enregistrée} : selon l'énoncé, aucune demande n'existe dans ce cas. Vous pouvez noter cette condition de création à côté du point initial.
+\end{warningbox}
+\subsection{Schéma lisible : vue des états et principaux événements}
+\begin{center}
+\begin{tikzpicture}[scale=.89,transform shape]
+\node[circle,fill=navy,inner sep=3pt] (i) at (0,0) {};
+\node[state] (a) at (2,0) {EN\_ATTENTE};
+\node[state] (co) at (5.4,0) {CONFIRMEE};
+\node[state] (en) at (8.8,0) {EN\_COURS};
+\node[state] (t) at (11.8,0) {TERMINEE};
+\node[state] (ref) at (1.8,-2.6) {REFUSEE};
+\node[state] (exp) at (5.1,-2.6) {EXPIREE};
+\node[state] (ann) at (8.8,-2.6) {ANNULEE};
+\draw[assoc] (i)--node[above,font=\scriptsize]{autorisationOK}(a);
+\draw[assoc] (a)--node[above,font=\scriptsize]{valider [OK]}(co);
+\draw[assoc] (co)--node[above,font=\scriptsize]{arrivée}(en);
+\draw[assoc] (en)--node[above,font=\scriptsize]{clôturer}(t);
+\draw[assoc] (a)--node[left,font=\scriptsize]{refus / conflit}(ref);
+\draw[assoc] (a)--node[right,font=\scriptsize]{after(12 h)}(exp);
+\draw[assoc] (co)--node[right,font=\scriptsize]{annuler [>24 h]}(ann);
+\draw[assoc] (co) to[bend left=52] node[above,font=\scriptsize]{annuler [\(\leq\)24 h] : refus} (co);
+\foreach \x/\y/\id/\from in {1.8/-3.65/fref/ref,5.1/-3.65/fexp/exp,8.8/-3.65/fann/ann,11.8/-1.25/fter/t} {
+  \node[circle,draw=navy,thick,minimum size=6mm,inner sep=0pt] (\id) at (\x,\y) {};
+  \node[circle,fill=navy,inner sep=1.8pt] at (\id.center) {};
+  \draw[assoc] (\from)--(\id);
+}
+\end{tikzpicture}
+\end{center}
+\textbf{L'attribut du domaine :} \texttt{DemandeReservation.statut : StatutReservation}. Les valeurs de l'énumération sont \emph{exactement} celles des rectangles. \textbf{Points finaux :} chaque issue \texttt{REFUSEE}, \texttt{EXPIREE}, \texttt{ANNULEE}, \texttt{TERMINEE} est terminale dans le périmètre indiqué ; un diagramme complet peut poser un pseudonœud final après chacune.
+\begin{answerbox}
+La \textbf{transition interne sur CONFIRMEE} lors d'une annulation tardive n'est \emph{pas} une annulation réelle : le statut ne change pas et le membre reçoit le motif du refus. Une copie qui passe en \texttt{ANNULEE} perd la règle « plus de 24 heures ».
+\end{answerbox}
+
+\section{Corrigé Q4 : diagramme des classes participantes (DCP)}
+\textbf{Un cas = un contrôle :} \texttt{ControleReservation}. Les trois maquettes donnent trois dialogues. Les entités choisies reprennent \textbf{sans renommage} celles de Q2.
+\begin{center}
+\begin{tikzpicture}[node distance=12mm and 15mm,scale=.89,transform shape]
+\node[actor] (a) at (0,1) {Membre};
+\node[dbox,text width=26mm] (d1) at (3,2.8) {«dialogue»\\EcranRecherche};
+\node[dbox,text width=26mm] (d2) at (3,.8) {«dialogue»\\EcranRecapitulatif};
+\node[dbox,text width=26mm] (d3) at (3,-1.2) {«dialogue»\\EcranConfirmation};
+\node[dbox,text width=30mm] (co) at (7.3,.8) {«contrôle»\\ControleReservation\\soumettre(), notifier()};
+\node[dbox] (m) at (11.5,2.9) {Membre};
+\node[dbox] (s) at (11.5,1.4) {Studio};
+\node[dbox] (r) at (11.5,-.1) {DemandeReservation};
+\node[dbox] (p) at (11.5,-1.6) {Paiement};
+\draw[-,thick] (a)--(d1);\draw[-,thick] (a)--(d2);\draw[-,thick] (a)--(d3);
+\draw[-,thick] (d1)--(co);\draw[-,thick] (d2)--(co);\draw[-,thick] (d3)--(co);
+\draw[-,thick] (co)--(m);\draw[-,thick] (co)--(s);\draw[-,thick] (co)--(r);\draw[-,thick] (co)--(p);
+\end{tikzpicture}
+\end{center}
+\textbf{À compléter si pertinent :} \texttt{Equipement} et \texttt{SelectionEquipement} peuvent être reliés au contrôle : ils participent au choix, aux conflits et au prix. Les boîtes \texttt{Dialogue} représentent les trois maquettes, pas des classes métier. Elles peuvent porter attributs d'écran/opérations de saisie. Le contrôle orchestre ; les calculs d'éligibilité et de prix restent dans les entités.
+\begin{answerbox}
+\textbf{Justification facile :} « Le membre parle aux écrans. Les écrans parlent à un contrôle pour le cas Réserver un studio. Le contrôle utilise les entités métier. Il n'y a jamais de lien direct entre un dialogue et une entité. »
+\end{answerbox}
+
+\section{Corrigé Q5 : séquence N3 (MVC)}
+\subsection{Participants et contrat de communication}
+\textbf{Participants :}
+\begin{itemize}
+\item \textbf{Acteurs et systèmes externes :} membre, gestionnaire de site, prestataire de paiement, service courriel.
+\item \textbf{Dialogues :} \texttt{EcranRecherche}, \texttt{EcranRecapitulatif}, \texttt{EcranConfirmation}.
+\item \textbf{Contrôle :} \texttt{ControleReservation}.
+\item \textbf{Entités métier :} \texttt{Membre}, \texttt{Studio}, \texttt{Equipement}, \texttt{DemandeReservation}, \texttt{Paiement}.
+\end{itemize}
+Pour une présentation lisible, les séquences N3 sont partagées en deux phases coordonnées : dépôt puis décision. Elles décrivent toujours \textbf{le même cas}.
+
+\subsection{N3 -- première partie : dépôt de la demande}
+\begin{center}
+\begin{tikzpicture}[x=.75cm,y=.60cm,scale=.90,transform shape]
+\foreach \x/\t in {0/Membre,2.8/Vue,5.7/Contrôle,8.5/Studio,11.5/Prestataire} {
+ \node[dbox,minimum width=19mm] at (\x,0) {\t};\draw[life](\x,-.45)--(\x,-13.8);
+}
+\draw[assoc](0,-1)--node[above,font=\scriptsize]{1: rechercher()}(2.8,-1);
+\draw[assoc](2.8,-2)--node[above,font=\scriptsize]{2: consulter()}(5.7,-2);
+\draw[assoc](5.7,-3)--node[above,font=\scriptsize]{3: estDisponible()}(8.5,-3);
+\draw[<-,dashed](5.7,-4)--node[above,font=\scriptsize]{4: disponibilités}(8.5,-4);
+\draw[teal] (4.9,-4.45) rectangle (9.5,-6.35);
+\node[font=\scriptsize,anchor=north west] at (5,-4.45){alt [vide] / [studio libre]};
+\draw[<-,dashed](2.8,-5.5)--node[above,font=\scriptsize]{5: résultat}(5.7,-5.5);
+\draw[assoc](0,-7)--node[above,font=\scriptsize]{6: choix et confirmation}(2.8,-7);
+\draw[assoc](2.8,-8)--node[above,font=\scriptsize]{7: soumettre()}(5.7,-8);
+\draw[assoc](5.7,-9)--node[above,font=\scriptsize]{8: montantAutoriser()}(11.5,-9);
+\draw[<-,dashed](5.7,-10)--node[above,font=\scriptsize]{9: réponse banque}(11.5,-10);
+\draw[teal] (4.9,-10.45) rectangle (12.5,-12.7);
+\node[font=\scriptsize,anchor=north west] at (5,-10.5){alt [paiement refusé] / [accepté]};
+\draw[<-,dashed](2.8,-11.4)--node[above,font=\scriptsize]{10a: échec}(5.7,-11.4);
+\draw[<-,dashed](2.8,-12.2)--node[above,font=\scriptsize]{10b: EN\_ATTENTE}(5.7,-12.2);
+\end{tikzpicture}
+\end{center}
+\textbf{Précisions indispensables sur cette figure compacte :} \texttt{ControleReservation} appelle \texttt{Membre.estActif()} et les contrôles de disponibilité des \texttt{Equipement}, puis fait calculer le prix par \texttt{DemandeReservation.calculerMontant()}. Après autorisation externe OK seulement, il demande la création de \texttt{DemandeReservation} avec le statut \texttt{EN\_ATTENTE}. Le \texttt{Paiement} prend le statut \texttt{AUTORISE}. Si autorisation refusée, aucune création. Les vues affichent la réponse ; les entités n'affichent jamais d'écran.
+
+\subsection{N3 -- deuxième partie : décision différée}
+\begin{center}
+\begin{tikzpicture}[x=.95cm,y=.59cm,scale=.9,transform shape]
+\foreach \x/\t in {0/Gestionnaire,3/Contrôle,6/Réservation,9/Prestataire} {
+ \node[dbox,minimum width=22mm] at (\x,0) {\t};\draw[life](\x,-.4)--(\x,-10.8);
+}
+\draw[assoc](0,-1)--node[above,font=\scriptsize]{1: décider()}(3,-1);
+\draw[assoc](3,-2)--node[above,font=\scriptsize]{2: vérifierRègles()}(6,-2);
+\draw[<-,dashed](3,-3)--node[above,font=\scriptsize]{3: OK/conflit}(6,-3);
+\draw[teal] (2.2,-3.55) rectangle (10,-10.4);
+\node[font=\scriptsize,anchor=north west] at (2.3,-3.6){alt [valider et libre]};
+\draw[assoc](3,-4.8)--node[above,font=\scriptsize]{4a: débiterAutorisation()}(9,-4.8);
+\draw[assoc](3,-5.8)--node[above,font=\scriptsize]{5a: confirmer(), facturer()}(6,-5.8);
+\draw[teal,densely dashed](2.2,-6.23)--(10,-6.23);
+\node[font=\scriptsize,anchor=north west] at (2.3,-6.29){[refuser ou conflit]};
+\draw[assoc](3,-7.06)--node[above,font=\scriptsize]{4b: leverAutorisation()}(9,-7.06);
+\draw[assoc](3,-7.83)--node[above,font=\scriptsize]{5b: refuser()}(6,-7.83);
+\draw[teal,densely dashed](2.2,-8.12)--(10,-8.12);
+\node[font=\scriptsize,anchor=north west] at (2.3,-8.18){[after(12 h)]};
+\draw[assoc](3,-8.93)--node[above,font=\scriptsize]{4c: leverAutorisation()}(9,-8.93);
+\draw[assoc](3,-9.78)--node[above,font=\scriptsize]{5c: expirer()}(6,-9.78);
+\end{tikzpicture}
+\end{center}
+\textbf{Courriels :} le contrôle fait appeler le \texttt{ServiceCourriel} extérieur après la création de la demande (accusé de réception) et après chaque décision (succès/refus/expiration). \textbf{Débit refusé après autorisation :} condition H4, à signaler si représentée ; la réservation ne peut être confirmée silencieusement sans débit, puisque l'énoncé exige débit puis confirmation.
+
+\begin{answerbox}
+\textbf{Pourquoi cette N3 respecte MVC :} la vue collecte/affiche ; le contrôle orchestre banque, entités et e-mails ; le Studio/Équipement vérifie ses disponibilités, le Membre son adhésion, la Demande calcule et change de statut, le Paiement porte son propre état. Aucun appel direct \texttt{Ecran -- Entité} et aucune base de données comme personnage du domaine.
+\end{answerbox}
+
+\section{Vérifications finales : modèle entier}
+\begin{tabularx}{\linewidth}{@{}p{48mm}X@{}}
+\toprule
+Vérification & Réponse attendue \\
+\midrule
+La banque refuse la préautorisation & Aucune demande \texttt{EN\_ATTENTE} ; pas de débit. \\
+Le gestionnaire ne répond pas sous 12 h & \texttt{EXPIREE}, libération, courriel. \\
+Le gestionnaire valide mais le studio n'est plus libre & \texttt{REFUSEE} ; ne pas débiter et informer. \\
+Le membre veut annuler 24 h exactement avant & Refus d'annuler ; reste \texttt{CONFIRMEE}. \\
+Le studio est en maintenance & Non proposé ; règle dans \texttt{Studio.estDisponible()}. \\
+Le membre choisit 4 équipements & Refuser ou forcer un nouveau choix, car maximum 3. \\
+Une facture contient trois dommages & Trois lignes distinctes ; composition Facture--LigneFacture. \\
+Le DCP utilise \texttt{Booking} au lieu de \texttt{DemandeReservation} & Incohérence de nom entre DCP et domaine. \\
+Le contrôle fait le calcul de prix à la place de la Demande & Mauvaise répartition MVC ; placer le calcul métier dans le modèle. \\
+\bottomrule
+\end{tabularx}
+\subsection{Auto-évaluation sur 20}
+\textbf{Q1 /4 :} acteurs+UC+conditions ; N1 noire avec toutes les branches.\\
+\textbf{Q2 /6 :} 10 concepts cohérents, associations et multiplicités justifiées, regroupement, exclus.\\
+\textbf{Q3 /3 :} les 7 statuts, événements, gardes, \texttt{after(12 h)}, retours/refus.\\
+\textbf{Q4 /3 :} 3 dialogues, 1 contrôle pour le cas, entités identiques au domaine.\\
+\textbf{Q5 /4 :} mêmes messages que N1, séparation MVC et traitement des échecs.
+
+\begin{memo}
+\textbf{La bonne copie n'est pas la plus chargée.} Une copie claire, qui explique la portée du système, les cardinalités, les exceptions et les hypothèses, vaut mieux qu'un grand schéma qui contredit le texte. Cette correction montre une solution plausible ; comparez toujours vos décisions aux \emph{règles du sujet}, pas seulement au dessin.
+\end{memo}
+\section*{Sources et statut de ce document}
+\addcontentsline{toc}{section}{Sources et statut de ce document}
+Examen blanc original rédigé à partir des compétences et des pièges de \textit{ASI\_C1, ASI\_C2, ASI\_C3, ASI\_C4, ASI\_C5}, ainsi que des niveaux de difficulté observables dans les TD \textit{Location de véhicules}, \textit{Organisation de courses de fond}, \textit{Agence de voyages}, \textit{Application hôtelière} et \textit{Emprunts du tiers-lieu culturel}. Il n'est \textbf{pas} un sujet officiel du professeur ; les choix détaillés et le barème sont ici pédagogiques.
+\end{document}
