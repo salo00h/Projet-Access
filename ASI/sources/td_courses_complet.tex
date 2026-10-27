@@ -1,0 +1,219 @@
+% Corrigé pédagogique original, fondé sur « Organisation de courses de fond » (6 p.).
+% Aucun diagramme du professeur reproduit ; choix de modélisation justifiés.
+\section{Cas final : organisation de courses de fond -- correction complète des 9 travaux}
+\begin{memo}
+Cette partie est la \textbf{référence de travail prioritaire}. Elle répond \textbf{aux neuf demandes} du dernier TD. Le texte du professeur fait autorité. Ce corrigé est \textbf{une proposition argumentée}, pas une correction officielle. Il faut déclarer nos hypothèses H1--H4 quand les règles ne sont pas explicites.
+\end{memo}
+\textbf{Faits à retenir :} course libre dès 16 ans, semi-marathon dès 18 ans, marathon dès 20 ans ; triathlon et vélo : inscription par club, en ligne ou par courrier, avec licence au lieu de certificat. Préinscription internet jusqu'à J--15, sous réserve de places. Sur place : dossier terminé au moins 1 h avant le départ, pas de triathlon/vélo. Par courrier : terminé au moins J--5. Paiement invalide ou certificat non conforme : annulation en ligne ; par courrier, demande de document et maintien à l'étape adaptée. Club classé par ses cinq meilleurs temps, sinon disqualifié (au plus quatre arrivants). SMS en option payante à 1 euro. Transpondeur : numéro de dossard, temps et passages, restitution obligatoire.
+
+\begin{warningbox}
+\textbf{Hypothèses déclarées :} H1 : un agent du secrétariat saisit les inscriptions reçues sur papier ou au guichet ; H2 : on sépare l'état de l'\texttt{Inscription} du support de paiement ; H3 : le statut d'inscription suit des étapes communes, sauf les parcours plus rapides qui sautent plusieurs étapes ; H4 : la catégorie d'âge et l'admissibilité sont vérifiées par \texttt{Epreuve} (le texte n'impose aucune classe responsable). Ne transformez pas ces choix en « faits du sujet ».
+\end{warningbox}
+
+\subsection{1. Cas d'utilisation : acteurs, objectifs et paquetages}
+\textbf{Acteurs primaires :} Concurrent, Club (pour vélo et triathlon), AgentSecrétariat, ServiceCourses, Administrateur (si gestion technique précisée). \textbf{Acteurs secondaires :} Banque/PrestataireCarte, SystèmeChronométrage (antennes et puces externes, sous H5 si le périmètre du logiciel ne les inclut pas), ServiceSMS (si externe). Un transpondeur passif n'est \textbf{pas automatiquement} acteur ; seul le dispositif qui échange effectivement des messages avec le système peut l'être.
+\begin{center}
+\begin{tikzpicture}[scale=.84,transform shape,node distance=9mm and 17mm]
+\node[actor] (cc) at (0,2.8) {Concurrent};\node[actor] (club) at (0,.8) {Club};
+\node[actor] (sec) at (0,-1.3) {Secrétariat};\node[actor] (srv) at (0,-3.3) {Service courses};
+\node[usecase] (online) at (4.5,3.2) {S'inscrire sur internet};
+\node[usecase] (cour) at (4.5,1.7) {Inscrire par courrier};
+\node[usecase] (place) at (4.5,.2) {Inscrire sur place};
+\node[usecase] (consult) at (4.5,-1.3) {Rechercher un classement};
+\node[usecase] (classer) at (4.5,-2.8) {Enregistrer classement};
+\node[usecase] (result) at (4.5,-4.3) {Enregistrer les temps};
+\node[actor] (bank) at (8.7,3.4) {Banque};
+\node[actor] (chrono) at (8.7,-4.3) {Système de\\chronométrage};
+\draw[navy] (2.7,-5.05) rectangle (7.1,4.05);
+\node[font=\scriptsize,fill=white] at (4.9,4.04){Système d'organisation des courses};
+\draw[navy] (cc)--(online);\draw[navy](cc)--(consult);
+\draw[navy](club)--(online);\draw[navy](club)--(cour);
+\draw[navy](sec)--(cour);\draw[navy](sec)--(place);
+\draw[navy](srv)--(classer);\draw[navy](srv)--(result);
+\draw[navy](bank)--(online);\draw[navy](chrono)--(result);
+\end{tikzpicture}
+\end{center}
+\textbf{Paquetages fonctionnels :} \texttt{Inscriptions}, \texttt{EpreuvesEtClubs}, \texttt{Classements}, \texttt{Chronometrage}. Un paquetage de cas n'est pas une étape du scénario. Les cas « consulter conditions » et « télécharger formulaire » appartiennent à l'espace public ; « gérer récompenses » au ServiceCourses. \textbf{Attention :} un Club n'est pas un « Concurrent amélioré » ; c'est un rôle institutionnel différent.
+
+\subsection{2. Description textuelle : inscription sur internet}
+\begin{tabularx}{\linewidth}{@{}p{32mm}X@{}}\toprule
+Nom / but & S'inscrire sur internet / obtenir l'inscription définitive à une épreuve autorisée.\\
+Acteur principal & Concurrent pour courses de fond classiques ; Club pour triathlon/vélo.\\
+Secondaires & Banque pour carte, Secrétariat pour chèque et justificatifs.\\
+Préconditions & Épreuve ouverte, places disponibles, date avant la limite J--15.\\
+Postcondition succès & Inscription définitive, paiement accepté et justificatif conforme.\\
+Postcondition échec & Demande annulée si paiement non valide ou pièce non conforme (voie internet).\\\bottomrule\end{tabularx}
+\textbf{Scénario nominal (course individuelle ordinaire) :}
+\begin{enumerate}
+\item Le concurrent choisit l'épreuve ; le système affiche règles, tarif et places.
+\item Le système vérifie date J--15, quota et condition d'âge ; si échec, il refuse la préinscription.
+\item Le concurrent saisit ses données ; si déjà connu, les anciennes données sont reprises.
+\item Le système enregistre la \texttt{PREINSCRIPTION}.
+\item Le concurrent choisit carte ou chèque. Carte : banque autorise ; chèque : le secrétariat contrôle sa conformité après réception.
+\item Si paiement accepté, le dossier passe à \texttt{FINANCIERE}.
+\item Le secrétariat reçoit le certificat médical de moins d'un an et vérifie sa conformité.
+\item Le dossier passe à \texttt{DEFINITIVE} ; le participant en est informé.
+\end{enumerate}
+\textbf{Alternatives :} A1 [déjà inscrit à une autre course] : récupérer ses informations, sans dispenser de certificat. A2 [club + triathlon/vélo] : le club saisit le concurrent et la licence remplace le certificat ; pas de guichet. A3 [chèque] : attendre la réception et le contrôle par secrétariat. \textbf{Exceptions :} E1 [quota plein ou après J--15] : aucune préinscription ; E2 [paiement refusé] : \texttt{ANNULEE}, avertir ; E3 [certificat non conforme] : \texttt{ANNULEE}, avertir. \textbf{Point difficile :} la réception du certificat est postérieure au paiement ; l'inscription n'est \textbf{pas} définitive au moment du paiement.
+
+\subsection{3. Les trois séquences système N1 d'inscription}
+\textbf{Règle :} un seul participant \texttt{:SystèmeCourses}, plus acteurs externes. Aucun contrôleur, écran ou DAO. Chaque case \texttt{alt} correspond à un véritable embranchement.
+\begin{center}\begin{tikzpicture}[x=1cm,y=.57cm]
+\foreach \x/\t in {0/Concurrent,4/SystèmeCourses,8/Banque}{\node[dbox] at (\x,0){\t};\draw[life](\x,-.5)--(\x,-11.1);}
+\draw[assoc](0,-1)--node[above,font=\scriptsize]{1: demanderPréinscription()}(4,-1);
+\draw[assoc](4,-2)--node[above,font=\scriptsize]{2: conditions/quota OK}(0,-2);
+\draw[assoc](0,-3)--node[above,font=\scriptsize]{3: saisirInformations()}(4,-3);
+\draw[assoc](0,-4)--node[above,font=\scriptsize]{4: choisirPaiement(carte)}(4,-4);
+\draw[assoc](4,-5)--node[above,font=\scriptsize]{5: autoriserPaiement()}(8,-5);
+\draw[densely dashed,-Stealth](8,-6)--node[above,font=\scriptsize]{6: réponse paiement}(4,-6);
+\draw[teal](-.5,-6.65) rectangle (8.6,-10.85);
+\node[font=\scriptsize,anchor=west] at (-.3,-6.95){alt [paiement accepté]};
+\draw[assoc](4,-7.75)--node[above,font=\scriptsize]{7a: attendre certificat}(0,-7.75);
+\node[font=\scriptsize] at (4,-8.33){réception et contrôle du certificat (secrétariat)};
+\draw[densely dashed,-Stealth](4,-9)--node[above,font=\scriptsize]{8a: confirmation définitive}(0,-9);
+\draw[densely dashed,teal](-.5,-9.25)--(8.6,-9.25);
+\node[font=\scriptsize,anchor=west] at (-.3,-9.55){[paiement refusé ou justificatif non conforme]};
+\draw[assoc](4,-10.25)--node[above,font=\scriptsize]{7b: annulation + avis}(0,-10.25);
+\end{tikzpicture}\end{center}
+\textbf{N1 internet :} le schéma illustre la branche carte. Pour une copie exhaustive, ajouter une ligne de vie Secrétariat et les messages de contrôle du chèque et de la pièce après leur réception ; il ne faut pas faire croire à une validation instantanée.
+\begin{center}\begin{tikzpicture}[x=1cm,y=.72cm]
+\foreach \x/\t in {0/Concurrent,5/SystèmeCourses,10/Secrétariat}{\node[dbox] at (\x,0){\t};\draw[life](\x,-.5)--(\x,-8.6);}
+\draw[assoc](0,-1)--node[above,font=\scriptsize]{1: remettreFormulaireEtPièces()}(10,-1);
+\draw[assoc](10,-2)--node[above,font=\scriptsize]{2: saisirInscription()}(5,-2);
+\draw[densely dashed,-Stealth](5,-3)--node[above,font=\scriptsize]{3: résultat contrôles}(10,-3);
+\draw[teal] (4,-3.6) rectangle (10.75,-8.2);
+\node[font=\scriptsize,anchor=west] at (4.2,-3.95){alt [valide, avant départ moins 1h et places]};
+\draw[assoc](10,-4.7)--node[above,font=\scriptsize]{4a: enregistrer définitivement()}(5,-4.7);
+\draw[densely dashed,-Stealth](5,-5.7)--node[above,font=\scriptsize]{5a: confirmer inscription}(10,-5.7);
+\draw[teal,densely dashed](4,-6.1)--(10.75,-6.1);
+\node[font=\scriptsize,anchor=west] at (4.2,-6.4){[sinon]};
+\draw[densely dashed,-Stealth](5,-7.25)--node[above,font=\scriptsize]{4b: rejet et motif}(10,-7.25);
+\end{tikzpicture}\end{center}
+\textbf{N1 sur place :} la branche est refusée aussi pour triathlon/vélo. Pour un paiement carte, la Banque reste un acteur secondaire distinct (ajouter son échange avant confirmation).
+\begin{center}\begin{tikzpicture}[x=1cm,y=.72cm]
+\foreach \x/\t in {0/Concurrent,5/Secrétariat,10/SystèmeCourses}{\node[dbox] at (\x,0){\t};\draw[life](\x,-.5)--(\x,-8.1);}
+\draw[assoc](0,-1)--node[above,font=\scriptsize]{1: envoyerDossierPapier()}(5,-1);
+\draw[assoc](5,-2)--node[above,font=\scriptsize]{2: saisirEtContrôlerDossier()}(10,-2);
+\draw[densely dashed,-Stealth](10,-3)--node[above,font=\scriptsize]{3: état du dossier}(5,-3);
+\draw[teal](4.2,-3.6)rectangle(10.6,-7.8);
+\node[font=\scriptsize,anchor=west] at (4.4,-3.9){alt [complet, reçu avant J--5]};
+\draw[densely dashed,-Stealth](10,-4.7)--node[above,font=\scriptsize]{4a: inscription définitive}(5,-4.7);
+\draw[teal,densely dashed](4.2,-5.15)--(10.6,-5.15);
+\node[font=\scriptsize,anchor=west] at (4.4,-5.46){[pièce manquante ou paiement non conforme]};
+\draw[densely dashed,-Stealth](10,-6.25)--node[above,font=\scriptsize]{4b: maintien état adéquat}(5,-6.25);
+\draw[assoc](5,-7.05)--node[above,font=\scriptsize]{5b: demander pièce au concurrent}(0,-7.05);
+\end{tikzpicture}\end{center}
+\textbf{N1 courrier :} la règle J--5 s'applique à la validation finale ; une pièce manquante peut être relancée, sans annulation automatique immédiate. Pour une inscription de club, le courrier vient du Club.
+
+\subsection{4. Classes du domaine : noms, propriétés, opérations, relations}
+\begin{center}\begin{tikzpicture}[scale=.86,transform shape]
+\node[dbox,align=left,minimum width=35mm] (co) at (0,3) {\textbf{Concurrent}\\nom : String\\naissance : Date\\sexe : Sexe\\estMajeurPour(e) : Bool};
+\node[dbox,align=left,minimum width=37mm] (ins) at (5,3) {\textbf{Inscription}\\date : Date\\dossard : String\\statut : StatutInscription\\valider() / annuler()};
+\node[dbox,align=left,minimum width=40mm] (ep) at (10,3) {\textbf{Epreuve}\\dateDépart : DateTime\\quotaMax : Integer\\tarif : Money\\estAdmissible(c) : Bool};
+\node[dbox,align=left,minimum width=35mm] (club) at (0,0) {\textbf{Club}\\nom : String\\discipline : Discipline};
+\node[dbox,align=left,minimum width=35mm] (pa) at (5,0) {\textbf{Paiement}\\montant : Money\\mode : ModePaiement\\estAccepté() : Bool};
+\node[dbox,align=left,minimum width=37mm] (just) at (10,0) {\textbf{Justificatif}\\dateValidité : Date\\type : TypeJustif\\estConforme() : Bool};
+\node[dbox,align=left,minimum width=35mm] (temps) at (0,-3) {\textbf{Passage}\\instant : DateTime\\tempsNet : Durée};
+\node[dbox,align=left,minimum width=35mm] (trans) at (5,-3) {\textbf{Transpondeur}\\codeDossard : String\\estRestitué : Bool};
+\node[dbox,align=left,minimum width=37mm] (cla) at (10,-3) {\textbf{Classement}\\position : Integer\\tempsFinal : Durée\\calculerPosition()};
+\draw[navy](co)--node[above,font=\scriptsize,pos=.10]{1}node[above,font=\scriptsize,pos=.86]{0..*}(ins);
+\draw[navy](ins)--node[above,font=\scriptsize,pos=.10]{0..*}node[above,font=\scriptsize,pos=.86]{1}(ep);
+\draw[navy](co)--node[left,font=\scriptsize]{0..1 / 0..*}(club);
+\draw[navy](ins)--node[left,font=\scriptsize]{1 / 0..1}(pa);
+\draw[navy](ins) to[bend left=13] node[right,font=\scriptsize,pos=.5]{1 / 0..1} (just);
+\draw[navy](ins)--node[above,sloped,font=\scriptsize]{0..1}(trans);
+\draw[navy](trans)--node[above,font=\scriptsize]{0..*}(temps);
+\draw[navy](ins)--node[above,sloped,font=\scriptsize]{0..1}(cla);
+\end{tikzpicture}\end{center}
+\textbf{Précision critique :} les multiplicités abrégées sur les liens obliques ci-dessus se lisent comme des \textbf{hypothèses de modélisation}, à détailler et justifier : une Inscription concerne exactement un Concurrent et une Epreuve ; un Concurrent peut avoir plusieurs Inscription ; un Paiement est rattaché au plus à une inscription individuelle dans ce modèle simplifié. Une catégorie de classement est une \textbf{valeur métier}, pas une nouvelle personne. Un Transpondeur peut être réaffecté dans le temps : les passages restent attachés à l'Inscription (ajouter une association précise en version de production).
+\textbf{Classes supplémentaires utiles :} \texttt{Edition}, \texttt{Troncon}, \texttt{Antenne}, \texttt{Recompense}, \texttt{Notification}, \texttt{ClubClassement}. Ne pas stocker un rang figé avant l'arrivée : la position est calculée depuis les temps. \textbf{Classe d'association} : \texttt{Inscription} porte les attributs du lien Concurrent--Epreuve. Les contraintes d'âge et de quotas appartiennent à \texttt{Epreuve} ; les statuts à \texttt{Inscription}.
+
+\subsection{5. Paquetages et dépendances}
+\begin{center}\begin{tikzpicture}[node distance=12mm and 20mm]
+\node[cbox] (s) {\textbf{Inscriptions}\\Concurrent, Inscription, Paiement\\Justificatif};
+\node[cbox,right=of s] (ev) {\textbf{Epreuves et clubs}\\Epreuve, Club, Edition};
+\node[cbox,below=of s] (ch) {\textbf{Chronométrage}\\Transpondeur, Passage\\Troncon, Antenne};
+\node[cbox,right=of ch] (res) {\textbf{Classements}\\Classement, Récompense};
+\draw[umlarrow](s)--(ev);\draw[umlarrow](res)--(s);\draw[umlarrow](res)--(ch);\draw[umlarrow](ch)--(ev);
+\end{tikzpicture}\end{center}
+\textbf{Critère :} découpage par responsabilité métier ; les dépendances pointent vers le paquetage \emph{utilisé}. Pas de dépendance circulaire. Si une opération impose un cycle, déplacer un concept dans un noyau partagé ou revoir le sens du lien.
+
+\subsection{6. États de l'inscription individuelle avec déclencheurs complets}
+\begin{center}\begin{tikzpicture}[node distance=15mm and 20mm]
+\node[state] (pre) {Préinscription};
+\node[state,right=of pre] (fin) {Inscription financière};
+\node[state,right=of fin] (def) {Inscription définitive};
+\node[state,below=of fin] (ann) {Annulée};
+\node[circle,fill=navy,inner sep=2pt,left=10mm of pre] (ini) {};
+\node[draw,circle,minimum size=7mm,inner sep=0pt,right=14mm of def] (end) {}; \node[fill=navy,circle,minimum size=3mm,inner sep=0pt] at (end.center) {};
+\draw[assoc](ini)--node[above,font=\tiny]{préinscrire [quota et date OK]}(pre);
+\draw[assoc](pre)--node[above,font=\tiny]{paiementAccepté / passerFinancière()}(fin);
+\draw[assoc](fin)--node[above,font=\tiny]{pièceConforme / confirmer()}(def);
+\draw[assoc](def)--(end);
+\draw[assoc](pre) to[bend right=28] node[below,font=\tiny]{paiementRefusé / annuler()} (ann);
+\draw[assoc](fin)--node[right,font=\tiny]{certificatRefusé / annuler()}(ann);
+\end{tikzpicture}\end{center}
+\textbf{Énumération :} \texttt{StatutInscription = \{PREINSCRIPTION, FINANCIERE, DEFINITIVE, ANNULEE\}}. Dans le parcours \textbf{courrier}, si une pièce manque on conserve PREINSCRIPTION ou FINANCIERE et on peut reprendre le contrôle : représenter une \textbf{boucle de régularisation} \texttt{pièceReçue [conforme] / continuer()}. Dans le parcours \textbf{sur place}, trois étapes peuvent être franchies dans la même opération (pas forcément trois écrans). \textbf{Délai :} J--15 bloque l'entrée internet, J--5 la validation courrier et 1 h le guichet ; ne pas inventer un \texttt{after(24h)} inexistant dans ce TD. Le mot \texttt{after(durée)} du cours est pertinent seulement quand un délai relatif déclenche réellement un changement d'état.
+
+\subsection{7. Deux DCP : inscription internet et recherche classement}
+\begin{center}\begin{tikzpicture}[node distance=10mm and 12mm]
+\node[actor] (a) {Concurrent};
+\node[cbox,right=of a] (v) {«dialogue»\\PageInscription};
+\node[cbox,right=of v] (c) {«contrôle»\\ControleInscription};
+\node[cbox,right=of c,yshift=26mm] (e) {«entité»\\Epreuve};
+\node[cbox,right=of c,yshift=13mm] (i) {«entité»\\Inscription};
+\node[cbox,right=of c,yshift=0mm] (con) {«entité»\\Concurrent};
+\node[cbox,right=of c,yshift=-13mm] (p) {«entité»\\Paiement};
+\node[cbox,right=of c,yshift=-26mm] (j) {«entité»\\Justificatif};
+\draw[navy](a)--(v);\draw[navy](v)--(c);\draw[navy](c)--(e);\draw[navy](c)--(i);\draw[navy](c)--(con);\draw[navy](c)--(p);\draw[navy](c)--(j);
+\end{tikzpicture}\end{center}
+\textbf{DCP inscription :} cinq entités du modèle : \texttt{Concurrent}, \texttt{Epreuve}, \texttt{Inscription}, \texttt{Paiement}, \texttt{Justificatif}. \texttt{PagePaiement} et \texttt{PageRecapitulatif} sont des dialogues \textbf{supposés} (H6), non fournis comme maquettes. La seule maquette réellement donnée est celle de recherche des classements. Le contrôle orchestre ; les entités valident la règle métier.
+\begin{center}\begin{tikzpicture}[node distance=9mm and 12mm]
+\node[actor] (a) {Visiteur};\node[cbox,right=of a] (v) {«dialogue»\\PageRecherche};
+\node[cbox,right=of v] (c) {«contrôle»\\ControleRecherche};
+\node[cbox,right=of c,yshift=16mm] (e) {«entité»\\Concurrent};
+\node[cbox,right=of c] (i) {«entité»\\Inscription};
+\node[cbox,right=of c,yshift=-16mm] (cl) {«entité»\\Classement};
+\draw[navy](a)--(v);\draw[navy](v)--(c);\draw[navy](c)--(e);\draw[navy](c)--(i);\draw[navy](c)--(cl);
+\end{tikzpicture}\end{center}
+\textbf{DCP classement :} les critères exacts de la maquette sont \texttt{Dossard, Nom, Prénom, Sexe, Catégorie}. Les entités doivent reprendre exactement les noms du domaine : \texttt{Concurrent, Inscription, Classement}. \textbf{Interdit :} un lien direct Dialogue--Entité. Un \texttt{ControleRecherche} distinct est justifié car c'est un autre cas d'utilisation.
+
+\subsection{8. Communication pour rechercher un classement}
+\begin{center}\begin{tikzpicture}[node distance=15mm and 22mm]
+\node[actor] (v) {Visiteur};\node[cbox,right=of v] (vue) {:PageRecherche};
+\node[cbox,right=of vue] (ctrl) {:ControleRecherche};
+\node[cbox,right=of ctrl] (dom) {:Classement};
+\draw[navy](v)--node[above,font=\tiny]{1: saisirCritères()}(vue);
+\draw[navy](vue)--node[above,font=\tiny]{2: rechercher()}node[below,font=\tiny]{5: afficher()}(ctrl);
+\draw[navy](ctrl)--node[above,font=\tiny]{3: obtenirRésultats()}node[below,font=\tiny]{4: résultats}(dom);
+\end{tikzpicture}\end{center}
+\textbf{Complément de modèle :} \texttt{ControleRecherche} peut demander au \texttt{Concurrent} les identités et à \texttt{Inscription} les dossards. L'ordre des messages est écrit \textbf{sur les liens}, pas sur un axe du temps. Une numérotation détaillée des appels imbriqués \texttt{1, 1.1, 1.2} est aussi valide si cohérente.
+
+\subsection{9. Séquence N3 MVC : inscription sur place}
+\begin{center}\begin{tikzpicture}[x=.82cm,y=.54cm]
+\foreach \x/\t in {0/Agent,3/PageGuichet,6/ControleInscription,9/Epreuve,12/Inscription}{\node[dbox,minimum width=21mm] at (\x,0){\t};\draw[life](\x,-.5)--(\x,-12.5);}
+\draw[assoc](0,-1)--node[above,font=\tiny]{1: saisirDossier()}(3,-1);
+\draw[assoc](3,-2)--node[above,font=\tiny]{2: inscrireSurPlace()}(6,-2);
+\draw[assoc](6,-3)--node[above,font=\tiny]{3: verifierQuotaAgeDélai()}(9,-3);
+\draw[densely dashed,-Stealth](9,-4)--node[above,font=\tiny]{4: résultat}(6,-4);
+\draw[teal](5.25,-4.6)rectangle(12.8,-11.9);
+\node[font=\tiny,anchor=west] at (5.45,-4.9){alt [admissible]};
+\draw[assoc](6,-5.8)--node[above,font=\tiny]{5a: contrôlerPaiementPièce()}(12,-5.8);
+\draw[densely dashed,-Stealth](12,-6.75)--node[above,font=\tiny]{6a: statut contrôle}(6,-6.75);
+\draw[assoc](6,-7.7)--node[above,font=\tiny]{7a: confirmer()}(12,-7.7);
+\draw[assoc](6,-8.6)--node[above,font=\tiny]{8a: afficherConfirmation()}(3,-8.6);
+\draw[teal,densely dashed](5.25,-9.2)--(12.8,-9.2);
+\node[font=\tiny,anchor=west] at (5.45,-9.5){[quota atteint / délai / justificatif invalide]};
+\draw[assoc](6,-10.4)--node[above,font=\tiny]{5b: afficherRefus(motif)}(3,-10.4);
+\end{tikzpicture}\end{center}
+\textbf{Participants métier à conserver dans une version exhaustive :} \texttt{Concurrent}, \texttt{Paiement}, \texttt{Justificatif}, au besoin \texttt{Banque} pour carte et \texttt{Club} en exclusion du guichet. Le contrôle appelle les \emph{opérations métier des entités}; il ne calcule pas lui-même les seuils d'âge et de délai. L'interface ne parle jamais directement à \texttt{Epreuve} ni à \texttt{Inscription}. Le N3 reprend les interactions externes du N1.
+
+\subsection{Dernière vérification des neuf réponses}
+\begin{tabularx}{\linewidth}{@{}p{24mm}X@{}}\toprule
+Questions & Critère de cohérence à vérifier avant de rendre \\\midrule
+1--2 & Même acteur principal, même scénario, différences club / individuel claires.\\
+3 & Trois canaux modélisés, cas d'erreur et retours, système noir.\\
+4--5 & Noms métier et multiplicités ; aucune classe de DAO dans le domaine, pas de cycle.\\
+6 & Énumération alignée et branches d'annulation/régularisation présentes.\\
+7--8 & Dialogue--Contrôle--Entités, acteurs à l'extérieur, mêmes noms, messages numérotés.\\
+9 & N3 MVC détaillée, mêmes événements que N1, contrôle court, règles dans les entités.\\\bottomrule\end{tabularx}
