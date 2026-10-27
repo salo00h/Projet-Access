@@ -4,6 +4,8 @@ Projet de préparation à l'examen, centré sur **Organisation de courses de fon
 
 ## Livrables
 
+- [`dist/PACK_IMPRESSION_ASI.pdf`](dist/PACK_IMPRESSION_ASI.pdf) : **fichier unique prêt à imprimer**, regroupant corrigé intégral, révision, examen blanc avec solution, dans cet ordre ; généré automatiquement.
+
 - [`dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf`](dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf) : **corrigé complet, indépendant et imprimable des neuf questions du TD final**, avec planches N1 (internet, guichet, courrier, club), classes, états, DCP, communication et N3. Modèle pédagogique **non officiel**.
 
 - [`dist/Revision_ASI_Courses_de_fond.pdf`](dist/Revision_ASI_Courses_de_fond.pdf) : fiche complète en français simple **avec les neuf questions du TD, une **description textuelle détaillée** et les diagrammes**.

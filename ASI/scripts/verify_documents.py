@@ -45,3 +45,16 @@ for i in range(1, 10):
     if not re.search(r'\\subsection\{' + str(i) + r'\.', td):
         raise SystemExit(f'TD QUESTION ABSENTE: {i}')
 print('Barème: 5 questions, 20 points. TD: 9 travaux présents.')
+
+# Le pack imprime tous les livrables dans l'ordre : TD, cours, examen.
+book = root/'dist'/'PACK_IMPRESSION_ASI.pdf'
+if not book.exists():
+    raise SystemExit(f'PACK ABSENT: {book}')
+def pages(path):
+    info = subprocess.check_output(['pdfinfo', str(path)], text=True)
+    return int(re.search(r'^Pages:\s*(\d+)', info, re.M).group(1))
+expected = sum(pages(p) for p in files.values())
+actual = pages(book)
+if actual != expected:
+    raise SystemExit(f'PACK INCOMPLET: {actual} au lieu de {expected} pages')
+print(f'Pack impression: OK - {actual} pages')
