@@ -1,0 +1,240 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\setsansfont{Carlito}
+\usepackage[french]{babel}
+\usepackage[margin=1.52cm,headheight=17pt,headsep=0.33cm,footskip=0.65cm]{geometry}
+\usepackage{xcolor,graphicx,tabularx,array,booktabs,multicol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,backgrounds}
+\usepackage{fancyhdr,lastpage,enumitem,hyperref,ragged2e}
+\hypersetup{colorlinks=true,urlcolor=cyan!40!black,linkcolor=cyan!40!black}
+\definecolor{marine}{HTML}{19384B}\definecolor{bleu}{HTML}{246E86}\definecolor{gris}{HTML}{526879}\definecolor{doux}{HTML}{EBF4F7}\definecolor{orange}{HTML}{A7761E}
+\pagestyle{fancy}\fancyhf{}\lhead{\color{marine}\bfseries ASI \textbar\ Fiche rapide UML}\rhead{\color{gris}\small M2 SIA -- Cas « Courses de fond »}\cfoot{\color{gris}\small \thepage/\pageref{LastPage}}
+\emergencystretch=4em
+\setlength{\parindent}{0pt}\setlength{\parskip}{3.2pt}
+\setlist[itemize]{leftmargin=*,topsep=2pt,itemsep=1pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=*,topsep=2pt,itemsep=1pt,parsep=0pt}
+\newcommand{\titre}[2]{\vspace*{0.12cm}{\LARGE\color{marine}\bfseries #1}\par\vspace{0.02cm}{\color{bleu}\small #2}\par\vspace{0.16cm}\hrule\vspace{0.15cm}}
+\newcommand{\soustitre}[1]{\vspace{0.12cm}{\large\bfseries\color{bleu}#1}\par\vspace{0.04cm}}
+\newcommand{\attention}[1]{\par\vspace{0.08cm}{\color{orange}\bfseries À éviter :} #1\par}
+\newcommand{\bonne}[1]{\par\vspace{0.06cm}{\color{bleu}\bfseries Vérifier :} #1\par}
+\newcommand{\diag}[2]{\begin{center}\includegraphics[width=#2\linewidth,height=0.49\textheight,keepaspectratio]{diagrams/#1.pdf}\end{center}}
+\newcommand{\petittableau}[2]{\begin{tabularx}{\linewidth}{@{}>{\bfseries\color{marine}}p{3.15cm}X@{}}#1 & #2\\\end{tabularx}}
+\tikzset{message/.style={-{Stealth[length=2mm]},line width=.75pt,draw=marine},retour/.style={-{Stealth[length=2mm]},line width=.68pt,dashed,draw=bleu},lifeline/.style={thin,densely dashed,gray},participant/.style={draw=bleu,rounded corners=2pt,fill=doux,minimum width=2.0cm,minimum height=.54cm,align=center,font=\scriptsize\bfseries},msglabel/.style={font=\scriptsize,fill=white,inner sep=1.2pt,text=marine}}
+\begin{document}
+\titre{FICHE VISUELLE UML}{10 pages pour dessiner sans mélanger les diagrammes -- Français simple -- Exemple : « Organisation de courses de fond »}
+\textbf{But :} apprendre les formes et les règles qui font gagner des points. Ce document propose des exemples cohérents issus du cas du professeur. Les noms des classes ajoutées sont des \textbf{choix de modélisation}, pas un corrigé officiel.
+\soustitre{Les 6 diagrammes prioritaires annoncés dans ASI\_C5}
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}p{3.8cm}X@{}}\toprule
+Cas d'utilisation & Qui utilise le système ? Pour quel objectif ? \\
+Séquence système N1 & Qui échange avec le système \textbf{boîte noire} ? \\
+Classes et paquetages & Quelles données métier, relations et multiplicités ? \\
+États & Quelles étapes et transitions dans la vie d'une inscription ? \\
+DCP & Quelles classes \emph{dialogue}, \emph{contrôle}, \emph{entité} ? \\
+Séquence N3 (MVC) & Comment ces classes collaborent pendant le scénario ? \\
+\bottomrule\end{tabularx}
+\vspace{0.15cm}
+\textbf{Dans le dernier TD :} description textuelle, séquences des trois canaux, communication et activité sont également utiles pour les exercices. La description textuelle est demandée à la question 2 ; la communication est demandée à la question 8. L'activité est abordée au cours, mais \emph{n'est pas dans les 9 questions de ce TD}.
+\soustitre{Les règles à surligner dans le sujet du professeur}
+\begin{tabularx}{\linewidth}{@{}p{3.2cm}X@{}}\toprule
+\textbf{Internet} & Préinscription si places disponibles, au plus tard \textbf{J--15}. Carte ou chèque ; certificat envoyé par courrier puis contrôlé. \\
+\textbf{Sur place} & Dossier complet \textbf{1 h avant le départ} ; espèces, chèque ou carte ; certificat vérifié encore. \\
+\textbf{Par courrier} & Formulaire + paiement + certificat ; dossier complet au plus tard \textbf{J--5} ; demander les pièces manquantes. \\
+\textbf{Triathlon et vélo} & Le \textbf{club} inscrit ; internet ou courrier uniquement ; \textbf{licence} à la place du certificat. \\
+\textbf{Classement} & Clubs : cinq meilleurs temps ; quatre arrivants ou moins = disqualifié. SMS seulement avec téléphone et option de 1~€. \\
+\bottomrule\end{tabularx}
+\soustitre{Méthode rapide devant le sujet}
+\begin{enumerate}\item Souligner acteurs, actions, objets métier, dates, conditions et exceptions.\item Faire le texte du cas d'utilisation : il pilote les séquences.\item Dessiner avec les mêmes mots dans tous les diagrammes.\item Lire chaque flèche et chaque multiplicité une dernière fois.\end{enumerate}
+\newpage
+\titre{1. Cas d'utilisation}{Acteurs hors du système -- objectifs métier dans des ovales}
+\diag{usecases}{.94}
+\soustitre{Comment le dessiner}
+\begin{enumerate}
+\item Dessiner un \textbf{rectangle} : le périmètre de l'application web.
+\item Placer les \textbf{acteurs dehors} (Concurrent, Club, Secrétariat, Banque...).
+\item Dans le rectangle, tracer les \textbf{ovales} : actions métier complètes.
+\item Relier acteur et cas par un \textbf{trait simple}, sans flèche de message.
+\end{enumerate}
+\textbf{Règle UML :} \texttt{«include»} = toujours exécuté ; la flèche pointillée va du cas de base vers le cas inclus. \texttt{«extend»} = option sous condition ; la flèche va de l'extension vers le cas de base. Ces relations ne sont pas nécessaires dans tous les diagrammes.
+\attention{Faire de la base de données un acteur ; mettre « cliquer sur Valider » comme cas ; inventer des \texttt{include} entre étapes chronologiques.}
+\bonne{Un cas = un objectif métier à la même granularité que les autres. Les acteurs sont des rôles, pas des noms de personnes.}
+\newpage
+\titre{2. Description textuelle détaillée}{Une réponse rédigée : très importante avant la séquence N1}
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}p{3.65cm}X@{}}\toprule
+Nom & S'inscrire sur internet \\
+But & Obtenir l'inscription définitive à une épreuve. \\
+Acteur principal & Concurrent (cas individuel) ; pour triathlon et vélo : responsable de club. \\
+Acteurs secondaires & Banque (carte), secrétariat (chèque et justificatif). \\
+Déclencheur & Le concurrent choisit une épreuve sur le site. \\
+Préconditions & Une épreuve est proposée. Les conditions de participation sont consultables. \\
+Postcondition succès & Une inscription définitive existe, paiement accepté et justificatif conforme. \\
+Postcondition échec & Préinscription refusée, ou demande annulée et personne informée après un contrôle négatif. \\
+\bottomrule\end{tabularx}
+\soustitre{Scénario nominal (paiement par carte)}
+\begin{enumerate}
+\item Le concurrent choisit une épreuve.
+\item Le système vérifie l'âge, le nombre de places et la date de préinscription (\textbf{J--15}).
+\item Le concurrent saisit ses informations ; les données antérieures peuvent être retrouvées.
+\item Le système crée la \textbf{préinscription}.
+\item Le concurrent choisit le paiement par carte.
+\item Le système demande l'autorisation de la banque.
+\item Si la banque accepte, le système passe à l'étape \textbf{financière}.
+\item Le concurrent envoie le certificat médical \textbf{par courrier}.
+\item Le secrétariat contrôle le document, daté de moins d'un an.
+\item Le système valide \textbf{l'inscription définitive}.
+\end{enumerate}
+\soustitre{Alternatives et exceptions}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}X@{}}\toprule
+\textbf{Chèque} & Le concurrent l'envoie par courrier ; contrôle du secrétariat. \\
+\textbf{Ancien participant} & Réutiliser ses données, sans supprimer le contrôle du justificatif. \\
+\textbf{Âge / places / date} & Refuser la préinscription, afficher un motif. \\
+\textbf{Paiement refusé} & Annuler l'inscription et prévenir le concurrent. \\
+\textbf{Certificat non conforme} & Annuler l'inscription et prévenir le concurrent. \\
+\textbf{Club} & Le club inscrit ses membres ; licence au lieu du certificat (variante). \\
+\bottomrule\end{tabularx}
+\attention{Écrire seulement trois étapes sans acteurs, préconditions, postconditions, exceptions ni résultat observable.}
+\newpage
+\titre{3. Séquence système N1}{Un seul participant interne : « Système » -- exemple : inscription internet}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\foreach \x/\nom in {1/Concurrent,5.5/Système,10/Banque,14.5/Secrétariat}{\node[participant] at (\x,0) {\nom};\draw[lifeline] (\x,-.34)--(\x,-10.7);}
+\draw[message] (1,-1)--node[msglabel,above]{1 : choisirEpreuve()} (5.5,-1);
+\draw[retour] (5.5,-1.7)--node[msglabel,above]{2 : conditions / refus (âge, place, date)} (1,-1.7);
+\draw[message] (1,-2.45)--node[msglabel,above]{3 : transmettreIdentité()} (5.5,-2.45);
+\draw[retour] (5.5,-3.15)--node[msglabel,above]{4 : préinscription enregistrée} (1,-3.15);
+\draw[message] (1,-3.9)--node[msglabel,above]{5 : payerParCarte()} (5.5,-3.9);
+\draw[message] (5.5,-4.6)--node[msglabel,above]{6 : autoriserPaiement()} (10,-4.6);
+\draw[retour] (10,-5.3)--node[msglabel,above]{7 : accepté / refusé} (5.5,-5.3);
+\draw[bleu,rounded corners=3pt] (.2,-5.78) rectangle (15.4,-7.03);
+\node[anchor=west,font=\scriptsize\bfseries,color=bleu] at (.35,-6.05){alt};
+\node[font=\scriptsize,color=marine,fill=white] at (7,-6.33){[paiement refusé] 8 : annuler + notifier (break)};
+\node[font=\scriptsize,color=marine,fill=white] at (7,-6.74){[sinon] continuer : étape financière confirmée};
+\draw[dashed,draw=bleu] (.32,-6.48) -- (15.26,-6.48);
+\draw[dashed,draw=bleu] (.32,-8.83) -- (15.26,-8.83);
+\draw[message] (14.5,-7.75)--node[msglabel,above]{9 : saisirRéceptionCertificat()} (5.5,-7.75);
+\draw[bleu,rounded corners=3pt] (.2,-8.12) rectangle (15.4,-9.28);
+\node[anchor=west,font=\scriptsize\bfseries,color=bleu] at (.35,-8.4){alt};
+\node[font=\scriptsize,color=marine,fill=white] at (7.5,-8.62){[sinon, certificat conforme] : valider inscription};
+\node[font=\scriptsize,color=marine,fill=white] at (7.5,-9.02){[non conforme] : annuler + notifier (break)};
+\draw[retour] (5.5,-9.90)--node[msglabel,above]{10 : état de la demande} (1,-9.90);
+\end{tikzpicture}
+\end{center}
+\textbf{Important :} le certificat arrive \textbf{par courrier}, puis le secrétariat saisit le résultat dans le système. La banque est un acteur externe ; on n'invente pas une classe \emph{Paiement} à ce niveau.
+\soustitre{Les formes à savoir reconnaître}
+\begin{tabularx}{\linewidth}{@{}p{2.5cm}X@{}}\toprule
+\textbf{Ligne de vie} & Verticale en pointillés, acteur ou Système. \\
+\textbf{Message} & Flèche pleine vers le destinataire ; nom d'opération. \\
+\textbf{Retour} & Flèche pointillée, information ou résultat. \\
+\textbf{alt / opt / loop} & \texttt{alt} = si/sinon ; \texttt{opt} = facultatif ; \texttt{loop} = répétition. \\
+\bottomrule\end{tabularx}
+\attention{IHM, contrôleur et objets du domaine visibles dans N1 ; oublier la réponse du système ou les refus.}
+\newpage
+\titre{4. Classes du domaine}{Concepts métier, attributs, opérations et multiplicités aux deux bouts}
+\diag{classes}{.88}
+\vspace{-0.10cm}
+\soustitre{Lire les multiplicités sans inverser}
+\begin{tabularx}{\linewidth}{@{}p{4.6cm}X@{}}\toprule
+\textbf{Concurrent 1 -- Inscription 0..*} & Une inscription concerne un concurrent ; un concurrent peut avoir plusieurs inscriptions. \\
+\textbf{Épreuve 1 -- Inscription 0..*} & Une inscription concerne une seule épreuve ; une épreuve reçoit plusieurs inscriptions. \\
+\textbf{Inscription 1 -- Paiement 0..*} & Modèle choisi : plusieurs tentatives de paiement possibles ; une tentative appartient à une inscription. \\
+\textbf{Inscription 1 -- Justificatif 0..1} & Un justificatif retenu pour la demande (hypothèse de simplification). \\
+\bottomrule\end{tabularx}
+\textbf{Notation :} classe = rectangle avec compartiments \emph{nom / attributs / opérations}. \texttt{0..1} facultatif, \texttt{1} obligatoire, \texttt{0..*} zéro à plusieurs, \texttt{1..*} un à plusieurs.
+\attention{Insérer \texttt{Formulaire}, \texttt{Database}, \texttt{DAO} dans le domaine ; placer toutes les multiplicités du même côté ; utiliser un losange sans règle métier.}
+\bonne{Même nom de classe dans le domaine et le DCP. Les attributs et opérations ci-dessus sont une proposition de modélisation, pas la seule solution possible.}
+\newpage
+\titre{5. Paquetages et diagramme d'états}{Un pour organiser les classes ; l'autre pour suivre la vie d'une inscription}
+\soustitre{A. Diagramme de paquetages}
+\diag{packages}{.94}
+\textbf{Flèche pointillée «depend» :} \emph{A dépend de B} : A utilise quelque chose défini dans B. On cherche des paquets métier cohérents et \textbf{sans cycle de dépendances}.
+\attention{Découper en couches techniques \emph{frontend/backend/base} si le sujet demande le domaine ; dessiner des flèches dans les deux sens sans raison.}
+\soustitre{B. Diagramme d'états d'une Inscription}
+\diag{states}{.95}
+\textbf{Syntaxe exacte :} \texttt{événement [condition] / action}. État initial = point plein ; état final = cercle double. Les délais se notent \texttt{after(durée)} \emph{quand l'énoncé donne une transition automatique}.
+\textbf{Attention :} le sujet indique des \textbf{dates limites} J--15, J--5 et 1~h ; il ne dit pas qu'un dossier en attente est automatiquement annulé à une date précise. \textbf{Ne pas inventer} un \texttt{after(15j)}. Par courrier, les pièces manquantes laissent la demande à l'étape précédente.
+\newpage
+\titre{6. DCP : classes participantes}{Trois types de classes : dialogue, contrôle, entité}
+\soustitre{A. DCP de l'inscription sur internet}
+\diag{dcp_internet}{.98}
+\soustitre{B. DCP de la recherche d'un classement}
+\diag{dcp_classement}{.98}
+\textbf{Dessin :} classe «dialogue» pour chaque écran, une classe «contrôle» par cas d'utilisation, classes «entité» venant du \textbf{modèle du domaine}.\par\smallskip
+\begin{tabularx}{\linewidth}{@{}p{3.0cm}X@{}}\toprule
+\textbf{Dialogue} & Attributs (données affichées ou saisies) + opérations (actions de l'utilisateur). \\
+\textbf{Contrôle} & Opérations seulement pour coordonner le cas. Ne décide pas seul les règles métier. \\
+\textbf{Entité} & Attributs seulement dans le \textbf{DCP} ; concepts identiques au diagramme du domaine. \\
+\bottomrule\end{tabularx}
+\attention{Lien direct dialogue--entité ; classe d'entité renommée ; acteur lié à une entité. Selon ASI\_C3, p. 24 : pas de navigation contrôle--dialogue dans le DCP.}
+\newpage
+\titre{7. Séquence N3 (MVC)}{Exemple difficile : inscription sur place (question 9)}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\foreach \x/\nom in {.8/Agent,3.1/IHM,5.4/Contrôle,7.7/Épreuve,10/Paiement,12.3/Justificatif,14.6/Inscription}{\node[participant,minimum width=1.75cm] at (\x,0) {\nom};\draw[lifeline] (\x,-.31)--(\x,-10.2);}
+\draw[message] (.8,-.85)--node[msglabel,above]{1 : saisir()} (3.1,-.85);
+\draw[message] (3.1,-1.6)--node[msglabel,above]{2 : demander()} (5.4,-1.6);
+\draw[message] (5.4,-2.35)--node[msglabel,above]{3 : admissible ?} (7.7,-2.35);
+\draw[retour] (7.7,-3.1)--node[msglabel,above]{4 : places, âge, heure} (5.4,-3.1);
+\draw[bleu,rounded corners=3pt] (.15,-3.47) rectangle (15.35,-4.49);
+\node[font=\scriptsize\bfseries,anchor=west,color=bleu] at (.28,-3.7){alt};
+\node[font=\scriptsize,fill=white] at (7.7,-3.83){[non admissible] : refuser, afficher (break)};
+\node[font=\scriptsize,fill=white] at (7.7,-4.22){[sinon, admissible] : poursuivre le dossier};
+\draw[dashed,draw=bleu] (.28,-4.02) -- (15.18,-4.02);
+\draw[dashed,draw=bleu] (.28,-8.03) -- (15.18,-8.03);
+\draw[message] (5.4,-5.00)--node[msglabel,above]{5 : vérifier paiement} (10,-5.00);
+\draw[retour] (10,-5.70)--node[msglabel,above]{6 : accepté ?} (5.4,-5.70);
+\draw[message] (5.4,-6.40)--node[msglabel,above]{7 : vérifier document} (12.3,-6.40);
+\draw[retour] (12.3,-7.10)--node[msglabel,above]{8 : conforme ?} (5.4,-7.10);
+\draw[bleu,rounded corners=3pt] (.15,-7.52) rectangle (15.35,-8.44);
+\node[font=\scriptsize\bfseries,anchor=west,color=bleu] at (.28,-7.73){alt};
+\node[font=\scriptsize,fill=white] at (7.7,-7.87){[paiement / document refusé] : refus (break)};
+\node[font=\scriptsize,fill=white] at (7.7,-8.19){[sinon, contrôles OK] : créer et valider};
+\draw[message] (5.4,-8.90)--node[msglabel,above]{9 : valider()} (14.6,-8.90);
+\draw[retour] (5.4,-9.65)--node[msglabel,above]{10 : confirmation} (3.1,-9.65);
+\end{tikzpicture}
+\end{center}
+\textbf{Hypothèse H1 :} l'agent du secrétariat saisit la demande dans une interface. Le participant fournit formulaire, paiement et certificat au guichet. \textbf{Rappel :} triathlon et vélo : pas d'inscription sur place.
+\textbf{MVC :} Vue/IHM transmet, Contrôle organise, Entités évaluent les règles et portent les données.
+\attention{IHM \(\rightarrow\) Entité ; contrôleur qui calcule seul la disponibilité et l'âge ; entité qui affiche l'écran.}
+\newpage
+\titre{8. Diagramme de communication}{Même logique que N3, mais les messages sont numérotés sur les liens}
+\diag{communication}{.95}
+\begin{tabularx}{\linewidth}{@{}p{1.2cm}X@{}}\toprule
+\textbf{1} & Le visiteur saisit les critères : dossard, nom, prénom, sexe, catégorie. \\
+\textbf{2} & Le dialogue demande la recherche au contrôle. \\
+\textbf{3--5} & Le contrôle interroge les entités Classement, Inscription et Concurrent. \\
+\textbf{6} & Le résultat revient vers le dialogue (ou « aucun résultat »). \\
+\bottomrule\end{tabularx}
+\textbf{Les formes :} rectangles = objets ; traits = liens ; flèches + numéros = messages. Il n'y a \textbf{pas de lignes de vie verticales}.
+\newpage
+\titre{9. Guide de contrôle avant de rendre}{Les erreurs les plus coûteuses dans la synthèse du professeur}
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}p{3.05cm}p{5.05cm}X@{}}\toprule
+Diagramme & Ce que je dois dessiner & À vérifier avant la copie \\
+\midrule
+Cas d'utilisation & Acteurs externes + frontière + ovales & Même niveau métier ; include/extend justifiés \\
+Description textuelle & But, acteurs, déclencheur, pré- et postconditions, étapes, exceptions & Une alternative ne doit pas disparaître dans N1 \\
+Séquence N1 & Acteur + Système seul + acteurs externes & \texttt{alt/opt/loop}, réponses, pas de Vue/Entité \\
+Classes du domaine & Classes métier, attributs et opérations & Deux multiplicités par association ; règles structurales \\
+Paquetages & Dossiers fonctionnels et dépendances pointillées & Cohésion, pas de cycle \\
+États & États, début/fin, événements, gardes, actions & Annulation, attentes et délais réellement donnés \\
+DCP & Dialogue, contrôle, entité & Une vue par écran ; un contrôle par cas ; pas de lien Vue--Entité \\
+N3 MVC & Acteur, Vue, Contrôle, Modèle & Même cas que N1, alternative d'erreur, MVC respecté \\
+Communication & Objets, liens, messages \textbf{numérotés} & Chaque message a son sens ; objets du DCP \\
+Activité & Actions, décisions, branches, début et fin & Flux et conditions, pas des états métier \\
+\bottomrule\end{tabularx}
+\soustitre{Cinq pièges difficiles du TD « Courses de fond »}
+\begin{enumerate}
+\item \textbf{J--15 n'est pas J--5 :} le premier concerne la préinscription internet, le second la fin du dossier par courrier.
+\item \textbf{Certificat médical :} reçu \emph{par courrier} ; pas de téléversement imposé par l'énoncé.
+\item \textbf{Un ancien concurrent} garde ses informations, mais son justificatif est \emph{recontrôlé}.
+\item \textbf{Triathlon/vélo :} le club inscrit ; licence à la place du certificat ; pas de guichet le jour J.
+\item \textbf{Classement club :} cinq temps utilisés ; quatre participants terminant ou moins = disqualification.
+\end{enumerate}
+\soustitre{Dernière vérification de cohérence (traçabilité)}
+\textbf{Cas d'utilisation}\(\rightarrow\) description textuelle\(\rightarrow\) \textbf{N1}\(\rightarrow\) \textbf{DCP}\(\rightarrow\) \textbf{N3}. Les entités du DCP = noms exacts des classes du domaine. Les états doivent correspondre aux valeurs de l'attribut / de l'énumération de statut.
+\soustitre{Diagramme d'activité (complément du cours)}
+\begin{center}\includegraphics[width=.89\linewidth,height=.24\textheight,keepaspectratio]{diagrams/activity.pdf}\end{center}
+\textbf{Formes :} point noir = début ; rectangle arrondi = action ; losange = choix ; double cercle = fin. Une activité montre un flux d'actions, pas le cycle d'états d'un objet. Le schéma résume la voie de préinscription ; les cas courrier/guichet ont d'autres gardes.
+\vfill
+\footnotesize\color{gris}Références : ASI\_C1 (cas et descriptions), ASI\_C2 (classes, paquetages, états), ASI\_C3 (DCP, N3, communication), ASI\_C5 (six diagrammes et erreurs fréquentes), TD \emph{Organisation de courses de fond} (pp.~3--6). Dessins illustratifs, non corrigé officiel.\par
+\end{document}

@@ -1,0 +1,22 @@
+digraph G {
+graph [fontname="Carlito", bgcolor="transparent", pad="0.10", ranksep="0.50", nodesep="0.30", outputorder=edgesfirst];
+node [fontname="Carlito", fontsize=12, color="#40778D", penwidth=1.3];
+edge [fontname="Carlito", fontsize=10, color="#52687C", penwidth=1.2, arrowsize=.7];
+
+layout=neato; overlap=true; sep=.50; splines=line;
+node [shape=box,style="rounded,filled",fillcolor="#ECF7FB",fontsize=12,width=1.55,height=.50];
+A [label="Visiteur",pos="0,0!",fillcolor="#F0F1FB"];
+V [label=":RechercheClassement\n«dialogue»",pos="194.4,0!"];
+C [label=":ControleRechercheClassement\n«contrôle»",pos="403.2,0!",fillcolor="#FBF5E1"];
+R [label=":Classement\n«entité»",pos="626.4,111.6!",fillcolor="#F0F1FB"];
+I [label=":Inscription\n«entité»",pos="626.4,0!",fillcolor="#F0F1FB"];
+P [label=":Concurrent\n«entité»",pos="626.4,-111.6!",fillcolor="#F0F1FB"];
+edge [arrowhead=normal,penwidth=1.2,fontsize=10];
+A -> V [label="1"];
+V -> C [label="2 / 6",dir=both];
+C -> R [label="3"];
+C -> I [label="4"];
+C -> P [label="5"];
+
+
+}

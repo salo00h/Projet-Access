@@ -8,10 +8,20 @@ pdf:
 	cp build/corrige_integral.pdf dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf
 	cp build/examen_blanc.pdf dist/Examen_Blanc_ASI_Corrige.pdf
 	pdfunite dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf dist/Revision_ASI_Courses_de_fond.pdf dist/Examen_Blanc_ASI_Corrige.pdf dist/PACK_IMPRESSION_ASI.pdf
+	for f in sources/diagrams/*.dot; do \
+		name="$$(basename "$$f" .dot)"; \
+		case "$$name" in \
+			usecases|classes|communication|activity) neato -n2 -Tpdf "$$f" -o "sources/diagrams/$$name.pdf" ;; \
+			*) dot -Tpdf "$$f" -o "sources/diagrams/$$name.pdf" ;; \
+		esac; \
+	done
+	cd sources && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=../build fiche_rapide.tex
+	cp build/fiche_rapide.pdf dist/Fiche_Rapide_ASI_UML_10_Pages.pdf
 verify:
 	python3 scripts/verify_documents.py
 	pdfinfo dist/Revision_ASI_Courses_de_fond.pdf | grep Pages
 	pdfinfo dist/Corrige_Integral_Courses_de_Fond_9_Questions.pdf | grep Pages
 	pdfinfo dist/Examen_Blanc_ASI_Corrige.pdf | grep Pages
+	pdfinfo dist/Fiche_Rapide_ASI_UML_10_Pages.pdf | grep 'Pages: *10'
 clean:
 	rm -rf build

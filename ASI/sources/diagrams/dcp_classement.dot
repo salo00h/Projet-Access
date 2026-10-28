@@ -1,0 +1,15 @@
+digraph G {
+graph [fontname="Carlito", bgcolor="transparent", pad="0.10", ranksep="0.50", nodesep="0.30", outputorder=edgesfirst];
+node [fontname="Carlito", fontsize=12, color="#40778D", penwidth=1.3];
+edge [fontname="Carlito", fontsize=10, color="#52687C", penwidth=1.2, arrowsize=.7];
+
+rankdir=LR;nodesep=.3;ranksep=.90;
+node [shape=record,style=filled,color="#487C91",fillcolor="#EAF6F9",fontsize=11];
+F [label="{«dialogue» RechercheClassement|dossard; nom; prénom; sexe; catégorie|rechercher(); afficher()}"];
+C [label="{«contrôle» ControleRechercheClassement|chercherClassements(); préparerRésultats()}",fillcolor="#F8F5E3",color="#B7A35B"];
+I [label="{«entité» Inscription|id; état}",fillcolor="#EEF0FF",color="#717CB8"];
+Co [label="{«entité» Concurrent|nom; sexe}",fillcolor="#EEF0FF",color="#717CB8"];
+Cl [label="{«entité» Classement|rang; temps}",fillcolor="#EEF0FF",color="#717CB8"];
+F -> C; C -> I; C -> Co; C -> Cl;
+
+}

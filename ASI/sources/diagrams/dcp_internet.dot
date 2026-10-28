@@ -1,0 +1,17 @@
+digraph G {
+graph [fontname="Carlito", bgcolor="transparent", pad="0.10", ranksep="0.50", nodesep="0.30", outputorder=edgesfirst];
+node [fontname="Carlito", fontsize=12, color="#40778D", penwidth=1.3];
+edge [fontname="Carlito", fontsize=10, color="#52687C", penwidth=1.2, arrowsize=.7];
+
+rankdir=LR;nodesep=.35;ranksep=.85;
+node [shape=record,style=filled,color="#487C91",fillcolor="#EAF6F9",fontsize=11];
+F [label="{«dialogue» FormulaireInscription|identité; épreuve|saisir(); soumettre()}"];
+P [label="{«dialogue» PagePaiement|mode; montant|payer()}"];
+C [label="{«contrôle» ControleInscriptionInternet|contrôlerDemande();\norganiserPaiement(); validerDossier()}",fillcolor="#F8F5E3",color="#B7A35B"];
+E [label="{«entité» Epreuve|dateDepart; capacite; tarif}",fillcolor="#EEF0FF",color="#717CB8"];
+I [label="{«entité» Inscription|canal; etat}",fillcolor="#EEF0FF",color="#717CB8"];
+Pay [label="{«entité» Paiement|mode; statut}",fillcolor="#EEF0FF",color="#717CB8"];
+J [label="{«entité» Justificatif|type; conforme}",fillcolor="#EEF0FF",color="#717CB8"];
+F->C;P->C;C->E;C->I;C->Pay;C->J;
+
+}

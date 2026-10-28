@@ -1,0 +1,15 @@
+digraph G {
+graph [fontname="Carlito", bgcolor="transparent", pad="0.10", ranksep="0.50", nodesep="0.30", outputorder=edgesfirst];
+node [fontname="Carlito", fontsize=12, color="#40778D", penwidth=1.3];
+edge [fontname="Carlito", fontsize=10, color="#52687C", penwidth=1.2, arrowsize=.7];
+
+rankdir=LR; nodesep=.55; ranksep=.95;
+node [shape=folder,style="filled,rounded",fillcolor="#EFF6FA",color="#417D91",fontsize=13,width=2.1,height=.75];
+r [label="Référentiel\nEpreuve / Concurrent / Club"];
+i [label="Inscriptions\nInscription / Paiement / Justificatif",fillcolor="#FFF8E7",color="#BE9A53"];
+c [label="Chronométrage\nDossard / Puce / Passage"];
+s [label="Résultats\nClassement / Récompense"];
+edge [style=dashed, label="«depend»", fontsize=10, color="#537387"];
+i -> r; c -> i; s -> c; s -> r;
+
+}

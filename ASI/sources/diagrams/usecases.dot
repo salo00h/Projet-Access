@@ -1,0 +1,28 @@
+graph G {
+graph [layout=neato, overlap=true, splines=line, pad=".18", bgcolor="transparent", outputorder="nodesfirst", fontname="Carlito"];
+node [fontname="Carlito", fontsize=13, color="#467F97", penwidth=1.3];
+edge [color="#718998",penwidth=1.1,dir=none];
+boundary [pos="316.8,237.6!",shape=box,width=6.20,height=6.15,style="rounded",fixedsize=true,label="",color="#9DB6C1",penwidth=1.7];
+node [shape=ellipse, style="filled", fillcolor="#F1F9FD",width=2.35,height=.64,fixedsize=true];
+a [pos="223.2,410.4!",label="Consulter les épreuves"];
+b [pos="223.2,324.0!",label="S'inscrire sur internet"];
+c [pos="223.2,237.6!",label="Inscrire un membre"];
+d [pos="223.2,151.2!",label="Rechercher un classement"];
+e [pos="432.0,410.4!",label="Enregistrer sur place"];
+f [pos="432.0,324.0!",label="Enregistrer courrier"];
+g [pos="432.0,237.6!",label="Contrôler paiement"];
+h [pos="432.0,151.2!",label="Suivre les passages"];
+i [pos="432.0,64.8!",label="Notifier par SMS"];
+node [shape=box,style="rounded,filled",fillcolor="#E9F0FA",color="#879BB6",width=1.55,height=.60,fixedsize=true,fontsize=12];
+Concurrent [pos="-7.2,381.6!",label="Concurrent"];
+Club [pos="-7.2,241.2!",label="Responsable de club"];
+Service [pos="-7.2,86.4!",label="Service course"];
+Secretariat [pos="662.4,388.8!",label="Secrétariat"];
+Banque [pos="662.4,244.8!",label="Banque externe"];
+Chrono [pos="662.4,104.4!",label="Chronométrage"];
+SMS [pos="662.4,18.0!",label="Service SMS"];
+Concurrent--a;Concurrent--b;Concurrent--d;Club--c;
+Secretariat--e;Secretariat--f;Secretariat--g;Banque--g;
+Service--h;Chrono--h;SMS--i;
+
+}

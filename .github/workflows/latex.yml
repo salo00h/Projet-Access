@@ -18,7 +18,7 @@ jobs:
       - name: Installer LaTeX et les polices
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq latexmk texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-lang-french fonts-crosextra-carlito poppler-utils
+          sudo apt-get install -y -qq latexmk texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-lang-french fonts-crosextra-carlito poppler-utils graphviz
       - name: Compiler les PDF
         run: make -C ASI pdf && make -C ASI verify
       - name: Publier les PDF dans le dépôt

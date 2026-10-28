@@ -1,0 +1,23 @@
+digraph G {
+graph [fontname="Carlito", bgcolor="transparent", pad="0.10", ranksep="0.50", nodesep="0.30", outputorder=edgesfirst];
+node [fontname="Carlito", fontsize=12, color="#40778D", penwidth=1.3];
+edge [fontname="Carlito", fontsize=10, color="#52687C", penwidth=1.2, arrowsize=.7];
+
+rankdir=LR; nodesep=.55; ranksep=.75; splines=true;
+node [shape=box,style="rounded,filled",fillcolor="#F3F9FC",fontsize=12,margin="0.15,0.15",color="#417F94"];
+start [shape=circle,label="",style=filled,fillcolor="#364C5C",width=.20,height=.20,fixedsize=true];
+pre [label="PRÉINSCRITE"];
+fin [label="FINANCIÈRE"];
+val [label="VALIDÉE",fillcolor="#E9F6ED",color="#438C70"];
+ann [label="ANNULÉE",fillcolor="#FFF0F1",color="#B36C76"];
+stop [shape=doublecircle,label="",style=filled,fillcolor="#364C5C",width=.25,height=.25,fixedsize=true];
+start -> pre [label="préinscription acceptée\n[place + délai + admissibilité] / créer"];
+pre -> fin [label="paiement accepté\n/ confirmer paiement"];
+fin -> val [label="justificatif conforme\n/ valider dossier"];
+pre -> ann [label="paiement refusé\n/ notifier"];
+fin -> ann [label="justificatif non conforme\n/ notifier"];
+start -> val [label="dossier complet sur place/courrier\n[contrôles OK] / enregistrer",color="#5C9B7F",fontcolor="#3B7660",constraint=false];
+val -> stop [label="clôture",fontsize=10];
+ann -> stop [label="clôture",fontsize=10];
+
+}

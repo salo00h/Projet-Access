@@ -1,0 +1,30 @@
+digraph G {
+graph [layout=neato, overlap=true, splines=true,pad=".08",bgcolor="transparent",outputorder=edgesfirst];
+node [fontname="Carlito",fontsize=15,shape=box,style="rounded,filled",fillcolor="#F2F8FC",color="#477E96",width=1.3,height=.6,penwidth=1.3];
+start [pos="0,144!",shape=circle,label="",width=.2,height=.2,fillcolor="#344C60"];
+choix [pos="108,144!",label="Choisir l'épreuve"];
+check [pos="216,144!",label="Contrôler âge,
+places et délai"];
+ok [pos="346,144!",shape=diamond,style=filled,fillcolor="#FFF8E8",label="Admissible ?",width=1.5,height=.9];
+refus [pos="486,245!",label="Refuser",fillcolor="#FDEEEF"];
+pre [pos="486,144!",label="Préinscrire"];
+pay [pos="615,144!",label="Contrôler paiement"];
+pok [pos="745,144!",shape=diamond,style=filled,fillcolor="#FFF8E8",label="Accepté ?",width=1.3,height=.9];
+ann [pos="849,245!",label="Annuler + notifier",fillcolor="#FDEEEF"];
+just [pos="745,20!",label="Vérifier justificatif"];
+jok [pos="615,20!",shape=diamond,style=filled,fillcolor="#FFF8E8",label="Conforme ?",width=1.4,height=.9];
+val [pos="486,20!",label="Valider",fillcolor="#EAF6EB"];
+end [pos="346,20!",shape=doublecircle,label="",width=.26,height=.26,fillcolor="#344C60"];
+edge [color="#59778B",fontname="Carlito",fontsize=12,penwidth=1.35,arrowsize=.75];
+start->choix->check->ok;
+ok->refus [label="non"];
+ok->pre [label="oui"];
+pre->pay->pok;
+pok->ann [label="non"];
+pok->just [label="oui"];
+just->jok;
+jok->ann [label="non"];
+jok->val [label="oui"];
+val->end;
+refus->end [constraint=false];ann->end [constraint=false];
+}

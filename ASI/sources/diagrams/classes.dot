@@ -1,0 +1,25 @@
+graph G {
+graph [layout=neato,overlap=true,splines=true,pad=".10",bgcolor="transparent",outputorder="edgesfirst"];
+node [shape=record,style=filled,fillcolor="#F3F9FC",color="#4D8399",fontname="Carlito",fontsize=15,penwidth=1.2,margin=".10,.08"];
+Club [pos="0.0,381.6!",label="{Club|id; nom; discipline}"];
+Concurrent [pos="226.8,381.6!",label="{Concurrent|id; nom; naissance; sexe|ageLeJour()}"];
+Epreuve [pos="496.8,381.6!",label="{Epreuve|id; type; départ; capacité|placesDisponibles()}"];
+Inscription [pos="241.2,208.8!",label="{Inscription|id; canal; état|valider(); annuler()}",fillcolor="#FFF4E2",color="#B99A5A"];
+Paiement [pos="-43.2,64.8!",label="{Paiement|montant; mode; statut|estAccepté()}"];
+Justificatif [pos="144.0,64.8!",label="{Justificatif|type; date; conforme|estValide()}"];
+Dossard [pos="327.6,64.8!",label="{Dossard|numéro|attribuer()}"];
+Classement [pos="504.0,64.8!",label="{Classement|rang; temps; catégorie|calculerPosition()}"];
+Puce [pos="327.6,-97.2!",label="{Puce|code; rendue|enregistrerRetour()}"];
+Passage [pos="504.0,-97.2!",label="{Passage|heure; tronçon|calculerTemps()}"];
+edge [color="#52687C",fontname="Carlito",fontsize=12,dir=none,penwidth=1.25];
+Club--Concurrent [taillabel="0..1", headlabel="0..*", labeldistance=1.7, labelangle=26];
+Concurrent--Inscription [taillabel="1", headlabel="0..*", labeldistance=1.4, labelangle=26];
+Epreuve--Inscription [taillabel="1", headlabel="0..*", labeldistance=1.4, labelangle=26];
+Inscription--Paiement [taillabel="1", headlabel="0..*", labeldistance=1.4, labelangle=26];
+Inscription--Justificatif [taillabel="1", headlabel="0..1", labeldistance=1.4, labelangle=26];
+Inscription--Dossard [taillabel="1", headlabel="0..1", labeldistance=1.4, labelangle=26];
+Inscription--Classement [taillabel="1", headlabel="0..1", labeldistance=1.4, labelangle=26];
+Dossard--Puce [taillabel="0..1", headlabel="0..1", labeldistance=1.4, labelangle=26];
+Puce--Passage [taillabel="1", headlabel="0..*", labeldistance=1.4, labelangle=26];
+
+}
